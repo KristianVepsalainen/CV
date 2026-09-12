@@ -1,0 +1,430 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Kristian Vepsalainen -- Curriculum Vitae (English)
+% Class: moderncv v1.2.0 (the .cls and .sty files shipped in this folder)
+% Compile: pdflatex cv_en.tex  (twice, for the page counter)
+%
+% Style notes:
+%  - 'banking' gives a full-width centred header and a clean single-column
+%    body: it scans faster than 'casual' and reads as more senior. Swap to
+%    'classic' if you prefer dates in a left-hand margin column.
+%  - The photo is commented out below. In Finland a photo is normal; for
+%    UK/US/remote-first employers it is a liability (some ATS and most
+%    US recruiters prefer no photo). Uncomment if you want it.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt,a4paper,sans]{moderncv}
+
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+
+%-------------------------------------------------------------------------------
+% VARIANT SWITCH -- flip this one line, recompile, get a different CV.
+%   \consultingtrue   = for consulting assignments / clients
+%   \consultingfalse  = for employment applications
+%-------------------------------------------------------------------------------
+\newif\ifconsulting
+\consultingfalse
+
+%-------------------------------------------------------------------------------
+% ONE-PAGE SWITCH -- \onepagertrue emits the condensed single-page version used
+% for cold outreach and first-pass screening. It ignores \ifconsulting.
+%-------------------------------------------------------------------------------
+\newif\ifonepager
+\onepagerfalse
+
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+
+% Slightly tighter section spacing than moderncv's default (2.5ex / 1ex).
+% This is what keeps the CV to three pages; raise the values if you prefer more air.
+\makeatletter
+\renewcommand*{\section}[1]{%
+  \par\addvspace{1.3ex}%
+  \phantomsection{}%
+  \addcontentsline{toc}{section}{#1}%
+  \strut\sectionstyle{#1}%
+  {\color{color1}\hrule}%
+  \par\nobreak\addvspace{0.6ex}\@afterheading}
+\makeatother
+
+% Tighter bullet lists inside cventry descriptions.
+\renewcommand{\itemhook}{%
+  \setlength{\topsep}{0pt}\setlength{\partopsep}{0pt}%
+  \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}%
+  \setlength{\leftmargin}{1.2em}}
+\usepackage[scale=0.84]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\rfoot{\footnotesize Kristian Veps\"al\"ainen --- page \thepage/\pageref{LastPage}}
+
+%----------------------------------------------------------------------------------------
+%	NAME AND CONTACT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\firstname{Kristian}
+\familyname{Veps\"al\"ainen}
+% Kept short on purpose: a longer title wraps onto a second line in the header.
+% The consulting framing is carried by the quote line and the "How I Work" section.
+\title{Data Scientist}
+\renewcommand*{\titlefont}{\LARGE\mdseries\upshape}
+
+% Contact details live in contact-en.tex, which is NOT committed to git
+% (it holds the phone number). Copy contact-en.example.tex to contact-en.tex
+% and fill it in. See README.md.
+\IfFileExists{contact-en.tex}{\input{contact-en.tex}}{%
+  \PackageError{cv}{contact-en.tex not found}{Copy contact-en.example.tex to contact-en.tex and fill in your details.}}
+
+%\photo[70pt][0.4pt]{picture}
+\ifconsulting
+  \quote{Bayesian modelling, causal inference and open-data analytics --- available for remote assignments}
+\else
+  \quote{Bayesian modelling, causal inference and open-data analytics --- delivered remotely}
+\fi
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\makecvtitle
+
+%----------------------------------------------------------------------------------------
+%	PROFILE
+%----------------------------------------------------------------------------------------
+
+\ifonepager
+
+\section{Profile}
+
+\cvitem{}{MSc (Mathematics) and MEng (Cyber Security). Ten years of statistics and data science across
+public health, social services and financial-sector compliance. Bayesian and causal modelling in R, the
+data engineering underneath it and reproducible reporting on top. Remote since 2020; on-site blocks of
+up to three consecutive days anywhere in Europe.}
+
+\section{Selected Proof}
+
+\cvitem{Open source}{Author of \textbf{finlex}, \textbf{swelex} and \textbf{danlex} on CRAN, and second
+most active contributor to \textbf{eurlex}. Building \emph{lexverse}, an R ecosystem for legal and
+regulatory data across jurisdictions.}
+
+\cvitem{Book and talks}{\emph{Bayesian Counterfactuals with R} --- under contract with \textbf{Chapman
+\& Hall/CRC}. Speaker at useR!~2026, Warsaw.}
+
+\cvitem{Research}{Nine peer-reviewed and conference publications, including deep-learning models on the
+health records of \textbf{1.4 million} Finns aged 65 and over (PMLR 116:93--111).}
+
+\cvitem{Regulated data}{Built OP's compliance rating model, scoring \textbf{130} member banks at launch
+and 92 four years later. BCBS~239 and supervisory reporting (FINREP, COREP, AnaCredit) from calculation
+through to submission.}
+
+\cvitem{Public sector}{Service-utilisation forecasts built for the Helsinki University Hospital district
+and the Vaasa region, distributed nationally through the Ministry of Social Affairs and Health during
+COVID-19.}
+
+\section{Experience}
+
+\cventry{10/2020--present}{Data Scientist / Compliance Analyst}{\textsc{OP Financial Group}}{Helsinki \& Kuopio (remote)}{}{}
+\cventry{06/2022--present}{Founder \& Principal Consultant}{\textsc{Own practice}}{Siilinj\"arvi (remote)}{}{}
+\cventry{01/2017--10/2020}{Data Scientist / Statistical Researcher}{\textsc{Finnish Institute for Health and Welfare}}{Helsinki}{}{}
+\cventry{2014--2017}{Statistical Specialist, then Researcher}{\textsc{Sosiaalitaito Oy; University of Eastern Finland}}{}{}{}
+
+\section{Skills}
+
+\cvitem{Technical}{R (expert, CRAN author; brms/Stan, tidyverse, Shiny), SQL, Python, Matlab \& Simulink
+$\cdot$ Bayesian hierarchical modelling, causal inference, forecasting, simulation $\cdot$ SAS Enterprise
+Guide, Abacus, Azure, AWS, Databricks, Power BI $\cdot$ Git, GitHub Actions CI, Quarto, Linux}
+
+\cvitem{Domain}{BCBS~239, supervisory reporting, AML/KYC, OSINT, GDPR, NIS2, EU AI Act, MDR, register
+data, open data}
+
+\section{Education}
+
+\cvitem{2020--2024}{MEng, Cyber Security --- JAMK University of Applied Sciences}
+\cvitem{2012--2016}{MSc, Mathematics --- University of Eastern Finland}
+
+\cvitem{}{Full CV with publications, package detail and project history:
+\url{https://www.kristianvepsalainen.com}}
+
+\else
+
+\section{Profile}
+
+\cvitem{}{MSc (Mathematics) and MEng (Cyber Security) with ten years in statistics and data science
+across public health, social services and financial-sector compliance. I build production statistical
+work end to end: Bayesian and causal models in R, the data engineering underneath them, and the
+reproducible reporting on top. I publish most of my work openly --- four packages on CRAN, nine
+peer-reviewed and conference publications, and a book on Bayesian counterfactuals under contract
+with Chapman \& Hall/CRC.}
+
+\ifconsulting
+\cvitem{}{I have worked in a distributed setup since 2020, delivering from Kuopio into a Helsinki-based
+organisation, and I collaborate asynchronously with open-source maintainers in the UK, Sweden and
+beyond through Git, code review and CI. Clients get a senior statistician who ships the whole chain
+himself --- no handover between a modeller, an engineer and a reporting team.}
+\else
+\cvitem{}{I have worked in a distributed setup since 2020, delivering from Kuopio into a Helsinki-based
+organisation, and I collaborate asynchronously with open-source maintainers in the UK, Sweden and beyond
+through Git, code review and CI. I am looking for a primarily remote role in Bayesian and causal
+modelling, open-data analytics, or data leadership in a small or mid-sized company. Remote does not mean
+never on site: for four years my rhythm has been two consecutive on-site days a month in Helsinki, and I
+am glad to keep that pattern --- up to three consecutive days, anywhere in Europe. Alongside my
+employment I run a small consulting practice, which is where my open-source work and academic
+collaborations come from; it does not compete with an employer, and my main job comes first.}
+\fi
+
+%----------------------------------------------------------------------------------------
+%	CORE SKILLS
+%----------------------------------------------------------------------------------------
+
+\ifconsulting
+\section{How I Work}
+
+\cvitem{Typical work}{Bayesian and causal modelling where the answer has to survive scrutiny; forecasting
+and scenario analysis; open-data and OSINT investigations; model validation and performance evidence
+that stands up to a regulator (AI Act, MDR); auditing an existing analytics stack.}
+
+\cvitem{Formats}{Fixed-scope projects, ongoing retainer, or a fractional Head of Data arrangement for a
+company that needs senior data judgement but not a full-time hire. Remote across European time zones,
+with on-site blocks of up to three consecutive days anywhere in Europe; working languages Finnish and
+English.}
+
+\cvitem{Deliverables}{Reproducible code and documented models, not slideware --- the client keeps
+everything and can rerun it. Quarto or R~Markdown reports, R packages where the work should outlive
+the project, plus a written handover.}
+
+\fi
+
+\fi
+
+%----------------------------------------------------------------------------------------
+%	SECTION CONTENT -- defined once, emitted in a variant-dependent order below.
+%	Edit the content here; change the running order in the \ifconsulting block
+%	at the bottom of this file.
+%----------------------------------------------------------------------------------------
+
+\newcommand{\SecSkills}{
+\section{Core Skills}
+
+\cvitem{Methods}{Bayesian hierarchical modelling (brms, Stan), causal inference and counterfactuals,
+forecasting and time series, survival analysis, simulation, sensitivity analysis, machine learning
+(incl.\ recurrent neural networks), convex optimisation (CVXR)}
+
+\cvitem{R}{Expert. Three packages on CRAN and contributions to a fourth. brms/Stan, tidyverse, Shiny,
+testthat, roxygen2, renv, Quarto; Git and GitHub Actions CI, Podman/Docker, mocked API tests}
+
+\cvitem{Other languages}{SQL (Oracle, Databricks) $\cdot$ Python --- analysis for the COVID-19 software
+sensor study $\cdot$ Matlab \& Simulink --- two macroeconomic simulation models $\cdot$ VBA, Java, \LaTeX}
+
+\cvitem{Platforms}{SAS Enterprise Guide --- AML risk model and FINREP, COREP and AnaCredit report
+calculation $\cdot$ Abacus --- submission of those reports to the supervisor $\cdot$ Azure secure analysis
+environment --- registry research with Tampere and Ume\aa{} $\cdot$ AWS $\cdot$ Databricks and Spark
+$\cdot$ Power BI --- supervisory rating dashboards and routine reporting $\cdot$ Elastic, SPSS, Linux
+(Fedora, Kali)}
+
+\cvitem{Domain}{BCBS~239, supervisory reporting (FINREP, COREP, AnaCredit) end to end from calculation to
+submission, capital adequacy, AML/KYC, OSINT, GDPR, NIS2, EU AI Act, MDR, register and patient-record
+data, EU and national open data}
+}
+
+\newcommand{\EntryOP}{
+\cventry{10/2020--present}{Data Scientist / Compliance Analyst}{\textsc{OP Financial Group}}{Helsinki \& Kuopio (remote)}{}{
+Compliance analytics across two mandates: supervisory scoring of member banks, then prudential compliance.
+\begin{itemize}
+\item Built the group's compliance rating model, scoring member cooperative banks 0--100 in three domains (investment services, AML, and governance and competence). Inputs combined indicator data (customer due diligence quality, staff training completion) with compliance officers' control findings and rule-based deductions for defined failures. The model covered 130 member banks at launch and 92 four years later as the group consolidated through mergers.
+\item Wrote text-mining tooling for compliance officers, including a script run twice a year across every investment advisory memorandum from the preceding six months, extracting recommended products and buy/sell/hold recommendations from free text in Finnish, Swedish and English, across retail and private banking segments with different product ranges.
+\item Prudential compliance (BCBS~239, capital adequacy): reverse-engineering of regulatory reports, data lineage modelling, metadata and data quality analysis, including analysis of data quality incident tickets and their resolution times.
+\item Trained machine-learning models to flag risk events in compliance data.
+\ifconsulting\item Fully distributed working model from Kuopio.\else\item Titles: Data Analyst (10/2020--09/2024), Compliance Officer (10/2024--08/2025), Data Analyst (09/2025--). Fully distributed working model from Kuopio.\fi
+\end{itemize}}
+}
+
+\newcommand{\EntryOwn}{
+\cventry{06/2022--present}{Founder \& Principal Consultant}{\textsc{Own practice, Business ID 3294018-7}}{Siilinj\"arvi (remote)}{}{
+Independent data science consultancy: Bayesian modelling, causal inference, open-data analytics and OSINT.
+\begin{itemize}
+\item Clients include Tampere University Eye Centre, Ume\aa{} University, Finnish wellbeing services counties and startups; two of these collaborations resulted in peer-reviewed publications.
+\item Typical assignments: forecasting models, causal and counterfactual analyses, data validation, visualisation, reproducible reporting.
+\item Author of white papers on Bayesian counterfactual analysis and on what the EU AI Act demands of model validation and performance evidence, aimed at health-tech SMEs.
+\item Also delivers university-level mathematics and physics tutoring.
+\end{itemize}}
+}
+
+\newcommand{\SecExperience}{
+\section{Work Experience}
+
+% The consulting version leads with the practice the client would be hiring;
+% the employment version leads with the current employed role.
+\ifconsulting\EntryOwn\EntryOP\else\EntryOP\EntryOwn\fi
+
+\cventry{01/2017--10/2020}{Data Scientist / Statistical Researcher}{\textsc{Finnish Institute for Health and Welfare (THL)}}{Helsinki}{}{
+Analytics on patient-record and national survey data, handling large volumes of sensitive data.
+\begin{itemize}
+\item Built service-utilisation forecasting models, initially for the Helsinki University Hospital district and the Vaasa region; during COVID-19 these were distributed through the Ministry of Social Affairs and Health for use across hospital districts nationally.
+\item Drug consumption modelling with pharmaceutical-sector partners, including a model of insulin (ATC~A10A) consumption built with L\"a\"aketietokeskus, and analyses for Nordic Healthcare Group and international pharmaceutical companies.
+\item Co-authored several peer-reviewed publications, including the deep-learning work on 1.4 million patient records listed below.
+\item Piloted a shared secure computing environment for public authorities; institute contact point for startups. Taught R programming and supervised bachelor's theses.
+\item Stack: R (Shiny, Sweave for automated reporting), Oracle SQL, Python, Power BI.
+\end{itemize}}
+
+\cventry{04/2015--01/2017}{Statistical Specialist}{\textsc{Sosiaalitaito Oy}}{J\"arvenp\"a\"a}{}{
+Statistical analysis of social and health services for the municipalities of Western and Central Uusimaa.
+Built a modelling and simulation tool for assessing changes to the regional social and healthcare service
+network, written in VBA specifically so that it would run on municipal workstations with no installation
+rights, letting each municipality analyse its own data independently. Stack: R, VBA, Power BI.}
+
+\cventry{06/2014--03/2015}{Grant-Funded Researcher}{\textsc{University of Eastern Finland}}{Joensuu}{}{
+Stock-flow consistent modelling of Finnish national accounts and of the finances of the Evangelical Lutheran
+Church of Finland, built in Matlab and Simulink.}
+
+\cventry{09/2013--10/2013}{Assistant}{\textsc{European Parliament}}{Brussels, Belgium}{}{
+Analytics on parliamentary decision-making and legislative processes. Stack: R and Java.}
+
+% 2010-2016 teaching history: relevant to an employer, not to a client.
+\ifconsulting\else
+\subsection{Earlier: Teaching and Publishing}
+
+\cvitem{2010--2016}{\textbf{Textbook author and editor}, e-Oppi Oy (2015--2016) --- wrote an electronic
+textbook for advanced upper-secondary mathematics, edited the grade-7 textbook $\cdot$
+\textbf{Instructor and coordinator}, Joensuu Science Society (2010--2015) --- science clubs and camps for
+primary-school children $\cdot$ \textbf{Substitute teacher}, various schools in Eastern Finland
+(2010--2013) --- mathematics, physics, chemistry and computer science.}
+\fi
+}
+
+\newcommand{\SecOpenSource}{
+\section{Open Source \& R Package Development}
+
+\cvitem{\textbf{lexverse}}{Author and architect of \emph{lexverse}, an emerging ecosystem of R packages
+giving a common interface to legal and regulatory data across jurisdictions --- a tidyverse-style standard
+for legal analytics. Harmonised tibble structures, offline-testable API clients, and cross-jurisdictional
+research that is currently impossible for lack of tooling.}
+
+\cvitem{\textbf{finlex}}{CRAN. Client for the Finnish Finlex Open Data API: statutes, consolidated texts,
+metadata and amendment chains. \url{https://cran.r-project.org/package=finlex}}
+
+\cvitem{\textbf{swelex}}{CRAN. Client for the Swedish Riksdag open data API.
+\url{https://cran.r-project.org/package=swelex}}
+
+\cvitem{\textbf{danlex}}{CRAN. Client for the Danish Retsinformation ELI API.
+\url{https://cran.r-project.org/package=danlex}}
+
+\cvitem{\textbf{eurlex}}{Contributor --- second most active by commit history. Led an architectural
+refactor of the SPARQL query builder, verified byte-identical against the previous implementation by a
+44-test harness, plus a 23-test \texttt{testthat} suite and roxygen2 docs. Part of the package's return
+to CRAN.}
+
+\cvitem{\textbf{Practices}}{Continuous integration with GitHub Actions, mocked HTTP tests
+(\texttt{httptest2}, \texttt{testthat}), pkgdown documentation, CRAN policy compliance, and code review
+with international maintainers.}
+}
+
+\newcommand{\SecPublications}{
+\section{Book, Talks and Publications}
+
+\cvitem{Book}{\emph{Bayesian Counterfactuals with R} --- under contract with \textbf{Chapman \& Hall/CRC} (forthcoming).}
+
+\cvitem{2026}{When One Hundredth of a Second Matters: Bayesian Counterfactual Modeling in R.
+\emph{useR!~2026 conference}, Warsaw, Poland.}
+
+\cvitem{2025}{Prototype master protocol for benchmarking of real-world follow-up data in glaucoma.
+\emph{Acta Ophthalmologica} 103:539--551. Benchmarked 4121 glaucoma patients at Tampere University
+Hospital against six published real-world data sets from Sweden and England.
+\small\url{https://doi.org/10.1111/aos.17453}}
+
+\cvitem{2025}{Users of reimbursed glaucoma medications in Finland in 1986--2023: a nationwide study.
+\emph{Acta Ophthalmologica} 103:348--356. Kela reimbursement registry, 193\,082 patients over 37 years.
+\small\url{https://doi.org/10.1111/aos.16803}}
+
+\cvitem{2022}{Impact of a CE certification-marked medical software sensor on COVID-19 pandemic
+progression prediction. \emph{JMIR Formative Research} 6(3):e35181. 414\,477 symptom-checker responses
+linked to national inpatient and outpatient registers. \small\url{https://doi.org/10.2196/35181}}
+
+\cvitem{2021}{Assessing health gradient with different equivalence scales for household income ---
+a sensitivity analysis. \emph{SSM --- Population Health} 15:100892. Ordered probit models on Finnish
+EU-SILC 2017 data ($N = 9406$). \small\url{https://doi.org/10.1016/j.ssmph.2021.100892}}
+
+\cvitem{2020}{Predicting utilization of healthcare services from individual disease trajectories using
+RNNs with multi-headed attention. \emph{PMLR} 116:93--111 (ML4H workshop, NeurIPS~2019). Electronic
+health records of 1.4 million Finns aged 65 and over; roughly 10\,\% better $R^2$ than count-based
+baselines and 38\,\% faster convergence.
+\small\url{https://proceedings.mlr.press/v116/kumar20a.html}}
+
+\cvitem{2019}{Assessing the quality of Finnish primary health care registers. \emph{9th Nordic Conference of Epidemiology and Register-Based Health Research}.}
+
+\cvitem{2017}{National accounts as a stock-flow consistent system, part 1: the real accounts.
+\emph{Fourth Nordic Post-Keynesian Conference}, Aalborg University. Five-sector simulation model
+producing time paths for 59 macroeconomic quantities, calibrated on Finnish national accounts 1975--2012.
+\small\url{https://arxiv.org/abs/2012.11282}}
+
+\cvitem{2017}{SIFT --- research of patient flows and structures in health and social care services in
+three Finnish cities, 2009--2015. \emph{International Journal of Integrated Care}.
+\small\url{https://doi.org/10.5334/ijic.3418}}
+
+\cvitem{Writing}{\emph{Maailma on jakauma} --- a Finnish-language blog on open data, Bayesian methods and
+reproducible analysis, at \url{https://www.kristianvepsalainen.com}}
+}
+
+\newcommand{\SecEducation}{
+\section{Education}
+
+\cventry{2020--2024}{Master of Engineering, Cyber Security}{JAMK University of Applied Sciences}{Jyv\"askyl\"a}{}{
+Focus on security testing and auditing, and their documentation.
+\newline\emph{Thesis:} Cyber intelligence for anti-money laundering, counter-terrorism financing and
+know your customer (47~pp.). Case study applying open-source intelligence (CYBINT/OSINT) to AML and
+customer due diligence in the financial sector, tested anonymously on person and company targets because
+of banking secrecy. Cited in two subsequent publications, including a Springer volume on AI in
+counter-terrorism (2025) --- unusual for a master's thesis at this level.
+Supervisors: Senior Researcher Tuomo Sipola \& Principal Lecturer Mika Rantonen.
+\small\url{https://urn.fi/URN:NBN:fi:amk-202404298239}}
+
+\cventry{2012--2016}{Master of Science}{University of Eastern Finland}{Joensuu}{}{
+Major: Mathematics. Minor: Industrial Engineering and Management.
+\newline\emph{Thesis:} Modeling National Accounts with Difference Equations --- a Matlab model of monetary
+flows between sectors of the national economy. Supervisors: Prof.\ Jukka Tuomela \& Lect.\ Matti Estola.}
+
+\cventry{2006--2012}{Bachelor of Science}{University of Eastern Finland}{Joensuu}{}{
+Major: Mathematics. Minors: Computer Science (intermediate studies), Statistics (extended intermediate
+studies), Economics and Entrepreneurship.}
+}
+
+\newcommand{\SecTail}{
+\section{Languages, Positions of Trust and Interests}
+
+\cvitem{Languages}{\textbf{Finnish} native $\cdot$ \textbf{English} full professional proficiency ---
+working language for a decade: publications, conference talks, international code review $\cdot$
+\textbf{Spanish} intermediate (B1--B2), in active study $\cdot$ \textbf{Swedish} basic}
+
+\cvitem{Boards}{STEFIM~ry (industrial and financial mathematics) 2015--2016 $\cdot$ Joensuun Elli
+student housing 2013--2017 $\cdot$ Joensuu Rotaract, vice chair 2013--2014}
+
+\cvitem{Interests}{Scuba diving (CMAS~P1, Nitrox) $\cdot$ fencing (\'ep\'ee, sabre) $\cdot$ amateur radio
+OH7EEP $\cdot$ open data advocacy}
+}
+
+%----------------------------------------------------------------------------------------
+%	RUNNING ORDER
+%----------------------------------------------------------------------------------------
+
+\ifonepager\else
+\ifconsulting
+  % Client's reading order: what I do, proof it exists, how I do it, who I've done it for.
+  \SecOpenSource
+  \SecSkills
+  \SecExperience
+  \SecPublications
+  \SecEducation
+  \SecTail
+\else
+  % Recruiter's reading order: skills, then chronology.
+  \SecSkills
+  \SecExperience
+  \SecOpenSource
+  \SecPublications
+  \SecEducation
+  \SecTail
+\fi
+\fi
+
+\end{document}

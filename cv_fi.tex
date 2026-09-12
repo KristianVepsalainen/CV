@@ -1,0 +1,431 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Kristian Vepsäläinen -- Ansioluettelo (suomi)
+% Luokka: moderncv v1.2.0 (tässä kansiossa olevat .cls- ja .sty-tiedostot)
+% Käännös: pdflatex cv_fi.tex  (kahdesti, sivulaskurin takia)
+%
+% Tyylihuomioita:
+%  - 'banking' antaa täysleveän keskitetyn otsikon ja selkeän yksipalstaisen
+%    rungon. Vaihda 'classic', jos haluat vuosiluvut vasempaan marginaaliin.
+%  - Valokuva on kommentoitu pois. Suomessa kuva on tavallinen; kansainvälisiin
+%    ja etätyöhakuihin (UK/US) se kannattaa jättää pois. Poista %-merkki,
+%    jos haluat kuvan mukaan.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[10pt,a4paper,sans]{moderncv}
+
+\moderncvstyle{banking}
+\moderncvcolor{blue}
+
+%-------------------------------------------------------------------------------
+% VERSIOKYTKIN -- vaihda yksi rivi, käännä uudelleen, saat eri CV:n.
+%   \consultingtrue   = konsultointitoimeksiantoihin / asiakkaille
+%   \consultingfalse  = työnhakuun
+%-------------------------------------------------------------------------------
+\newif\ifconsulting
+\consultingfalse
+
+%-------------------------------------------------------------------------------
+% YHDEN SIVUN KYTKIN -- \onepagertrue tulostaa tiivistetyn yksisivuisen version
+% kylmiin yhteydenottoihin ja ensivaiheen seulaan. Ohittaa \ifconsulting-asetuksen.
+%-------------------------------------------------------------------------------
+\newif\ifonepager
+\onepagerfalse
+
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+
+% Hieman tiiviimpi osioväli kuin moderncv:n oletus (2.5ex / 1ex).
+% Tämä pitää CV:n kolmella sivulla; kasvata arvoja jos haluat enemmän ilmaa.
+\makeatletter
+\renewcommand*{\section}[1]{%
+  \par\addvspace{1.3ex}%
+  \phantomsection{}%
+  \addcontentsline{toc}{section}{#1}%
+  \strut\sectionstyle{#1}%
+  {\color{color1}\hrule}%
+  \par\nobreak\addvspace{0.6ex}\@afterheading}
+\makeatother
+
+% Tiiviimmät luettelomerkit cventry-kuvauksissa.
+\renewcommand{\itemhook}{%
+  \setlength{\topsep}{0pt}\setlength{\partopsep}{0pt}%
+  \setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}%
+  \setlength{\leftmargin}{1.2em}}
+\usepackage[scale=0.84]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\rfoot{\footnotesize Kristian Vepsäläinen --- sivu \thepage/\pageref{LastPage}}
+
+%----------------------------------------------------------------------------------------
+%	NIMI JA YHTEYSTIEDOT
+%----------------------------------------------------------------------------------------
+
+\firstname{Kristian}
+\familyname{Vepsäläinen}
+\title{Data Scientist}
+\renewcommand*{\titlefont}{\LARGE\mdseries\upshape}
+
+% Yhteystiedot ovat tiedostossa contact-fi.tex, jota EI viedä gitiin
+% (siellä on puhelinnumero). Kopioi contact-fi.example.tex -> contact-fi.tex
+% ja täytä se. Ks. README.md.
+\IfFileExists{contact-fi.tex}{\input{contact-fi.tex}}{%
+  \PackageError{cv}{contact-fi.tex puuttuu}{Kopioi contact-fi.example.tex -> contact-fi.tex ja taeytae yhteystiedot.}}
+
+%\photo[70pt][0.4pt]{picture}
+\ifconsulting
+  \quote{Bayesilainen mallinnus, kausaalipäättely ja avoimen datan analytiikka --- vapaana etätoimeksiantoihin}
+\else
+  \quote{Bayesilainen mallinnus, kausaalipäättely ja avoimen datan analytiikka --- etänä toteutettuna}
+\fi
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\makecvtitle
+
+%----------------------------------------------------------------------------------------
+%	PROFIILI
+%----------------------------------------------------------------------------------------
+
+\ifonepager
+
+\section{Profiili}
+
+\cvitem{}{FM (matematiikka) ja insinööri YAMK (kyberturvallisuus). Kymmenen vuoden kokemus
+tilastotieteestä ja data sciencestä kansanterveyden, sosiaalihuollon ja finanssialan compliancen
+parissa. Bayesilainen ja kausaalinen mallinnus R:llä, sen alla oleva datatekniikka ja päälle rakentuva
+toistettava raportointi. Etänä vuodesta 2020; lähijaksot enintään kolme peräkkäistä päivää missä tahansa
+Euroopassa.}
+
+\section{Näyttö}
+
+\cvitem{Avoin lähdekoodi}{\textbf{finlex}-, \textbf{swelex}- ja \textbf{danlex}-pakettien tekijä
+CRANissa sekä \textbf{eurlexin} toiseksi aktiivisin kehittäjä. Rakennan \emph{lexverseä},
+R-ekosysteemiä oikeudelliselle ja sääntelydatalle yli lainkäyttöalueiden.}
+
+\cvitem{Kirja ja esitelmät}{\emph{Bayesian Counterfactuals with R} --- sopimus kustantajan
+\textbf{Chapman \& Hall/CRC} kanssa. Esitelmöijä useR!~2026, Varsova.}
+
+\cvitem{Tutkimus}{Yhdeksän vertaisarvioitua ja konferenssijulkaisua, mm.\ syväoppimismallit
+\textbf{1,4 miljoonan} yli 65-vuotiaan suomalaisen potilaskertomusaineistolla (PMLR 116:93--111).}
+
+\cvitem{Säännelty data}{Rakensin OP:n compliance-ratingmallin, joka pisteytti \textbf{130} osuuspankkia
+käyttöönotossa ja 92 neljä vuotta myöhemmin. BCBS~239 ja viranomaisraportointi (FINREP, COREP,
+AnaCredit) laskennasta toimitukseen asti.}
+
+\cvitem{Julkinen sektori}{Palvelunkäytön ennustemallit HUSin ja Vaasan alueen käyttöön; koronan aikana
+välitettiin STM:n kautta sairaanhoitopiirien käyttöön valtakunnallisesti.}
+
+\section{Työkokemus}
+
+\cventry{10/2020--}{Data Scientist / compliance-analyytikko}{\textsc{OP Ryhmä}}{Helsinki \& Kuopio (etä)}{}{}
+\cventry{06/2022--}{Yrittäjä ja pääkonsultti}{\textsc{Oma toiminimi}}{Siilinjärvi (etä)}{}{}
+\cventry{01/2017--10/2020}{Tilastotutkija / Data Scientist}{\textsc{Terveyden ja hyvinvoinnin laitos}}{Helsinki}{}{}
+\cventry{2014--2017}{Tilastoasiantuntija, sittemmin apurahatutkija}{\textsc{Sosiaalitaito Oy; Itä-Suomen yliopisto}}{}{}{}
+
+\section{Osaaminen}
+
+\cvitem{Tekninen}{R (asiantuntija, CRAN-tekijä; brms/Stan, tidyverse, Shiny), SQL, Python, Matlab \&
+Simulink $\cdot$ bayesilainen hierarkkinen mallinnus, kausaalipäättely, ennustaminen, simulointi $\cdot$
+SAS Enterprise Guide, Abacus, Azure, AWS, Databricks, Power BI $\cdot$ Git, GitHub Actions -CI, Quarto,
+Linux}
+
+\cvitem{Toimiala}{BCBS~239, viranomaisraportointi, AML/KYC, OSINT, GDPR, NIS2, EU:n tekoälyasetus, MDR,
+rekisteridata, avoin data}
+
+\section{Koulutus}
+
+\cvitem{2020--2024}{Insinööri (ylempi AMK), kyberturvallisuus --- Jyväskylän ammattikorkeakoulu}
+\cvitem{2012--2016}{Filosofian maisteri, matematiikka --- Itä-Suomen yliopisto}
+
+\cvitem{}{Täysi CV julkaisuineen, pakettitietoineen ja projektihistorioineen:
+\url{https://www.kristianvepsalainen.com}}
+
+\else
+
+\section{Profiili}
+
+\cvitem{}{FM (matematiikka) ja insinööri (ylempi AMK, kyberturvallisuus), jolla on kymmenen vuoden kokemus
+tilastotieteestä ja data sciencestä kansanterveyden, sosiaalihuollon ja finanssialan compliancen parissa.
+Teen tilastollisen työn päästä päähän: bayesilaiset ja kausaaliset mallit R:llä, niiden alla oleva
+datatekniikka ja päälle rakentuva toistettava raportointi. Julkaisen suurimman osan työstäni avoimesti ---
+neljä pakettia CRANissa, yhdeksän vertaisarvioitua ja konferenssijulkaisua sekä bayesilaisia
+kontrafaktuaaleja käsittelevä kirja sopimuksessa kustantajan Chapman \& Hall/CRC kanssa.}
+
+\ifconsulting
+\cvitem{}{Olen tehnyt työtä hajautetusti vuodesta 2020 Kuopiosta helsinkiläiseen organisaatioon ja teen
+asynkronista yhteistyötä avoimen lähdekoodin ylläpitäjien kanssa Britanniassa, Ruotsissa ja muualla
+Gitin, koodikatselmointien ja CI:n välityksellä. Asiakas saa kokeneen tilastotieteilijän, joka toimittaa
+koko ketjun itse --- ei siirtoja mallintajan, datainsinöörin ja raportointitiimin välillä.}
+\else
+\cvitem{}{Olen tehnyt työtä hajautetusti vuodesta 2020 Kuopiosta helsinkiläiseen organisaatioon ja teen
+asynkronista yhteistyötä avoimen lähdekoodin ylläpitäjien kanssa Britanniassa, Ruotsissa ja muualla
+Gitin, koodikatselmointien ja CI:n välityksellä. Etsin pääosin etänä tehtävää työtä bayesilaisen ja kausaalisen
+mallinnuksen, avoimen datan analytiikan tai pk-yrityksen datajohtamisen parissa. Etätyö ei tarkoita
+sitä, etten tule paikalle: neljän vuoden ajan rytmini on ollut kaksi peräkkäistä lähipäivää kuukaudessa
+Helsingissä, ja jatkan mielelläni samalla tavalla --- enintään kolme peräkkäistä päivää, missä tahansa
+Euroopassa. Pidän työn ohella pientä konsultointitoimintaa, jonka kautta syntyvät avoimen lähdekoodin
+työni ja akateemiset yhteistyöni; se ei kilpaile työnantajan kanssa, ja päätyöni tulee ensin.}
+\fi
+
+%----------------------------------------------------------------------------------------
+%	YDINOSAAMINEN
+%----------------------------------------------------------------------------------------
+
+\ifconsulting
+\section{Miten työskentelen}
+
+\cvitem{Tyypilliset työt}{Bayesilainen ja kausaalinen mallinnus kun vastauksen on kestettävä kriittinen
+tarkastelu; ennustaminen ja skenaarioanalyysi; avoimen datan ja OSINTin tutkimukset; mallien validointi
+ja suorituskykyväitteiden todentaminen niin että ne kestävät viranomaisen tarkastelun (tekoälyasetus,
+MDR); analytiikan auditointi.}
+
+\cvitem{Muodot}{Kiinteästi rajattu projekti, jatkuva kuukausisopimus tai vuokrattava Head of Data
+-järjestely yritykselle, joka tarvitsee kokeneen datanäkemyksen muttei kokoaikaista rekrytointia. Etänä
+eurooppalaisilla aikavyöhykkeillä, lähijaksot enintään kolme peräkkäistä päivää missä tahansa
+Euroopassa; kielet suomi ja englanti.}
+
+\cvitem{Toimitukset}{Toistettava koodi ja dokumentoidut mallit, ei kalvosulkeisia --- asiakas saa kaiken
+itselleen ja voi ajaa sen uudelleen. Quarto- tai R~Markdown -raportit, R-paketteja kun työn kuuluu elää
+projektia pidempään, ja kirjallinen luovutus.}
+
+\fi
+
+\fi
+
+%----------------------------------------------------------------------------------------
+%	OSIOIDEN SISÄLTÖ -- määritellään kerran, tulostetaan versiokohtaisessa
+%	järjestyksessä tiedoston lopun \ifconsulting-lohkossa.
+%----------------------------------------------------------------------------------------
+
+\newcommand{\SecSkills}{
+\section{Ydinosaaminen}
+
+\cvitem{Menetelmät}{Bayesilainen hierarkkinen mallinnus (brms, Stan), kausaalipäättely ja
+kontrafaktuaalit, ennustaminen ja aikasarjat, elinaika-analyysi, simulointi, herkkyysanalyysi,
+koneoppiminen (ml.\ toistuvat neuroverkot), konveksi optimointi (CVXR)}
+
+\cvitem{R}{Asiantuntija. Kolme pakettia CRANissa ja kontribuutioita neljänteen. brms/Stan, tidyverse,
+Shiny, testthat, roxygen2, renv, Quarto; Git ja GitHub Actions -CI, Podman/Docker, mockatut API-testit}
+
+\cvitem{Muut kielet}{SQL (Oracle, Databricks) $\cdot$ Python --- analyysi COVID-19-ohjelmistosensorin
+tutkimuksessa $\cdot$ Matlab \& Simulink --- kaksi makrotalouden simulointimallia $\cdot$ VBA, Java, \LaTeX}
+
+\cvitem{Alustat}{SAS Enterprise Guide --- AML-riskimalli sekä FINREP-, COREP- ja AnaCredit-raporttien
+laskenta $\cdot$ Abacus --- samojen raporttien toimitus valvojalle $\cdot$ Azuren tietoturvallinen
+käyttöympäristö --- rekisteritutkimus Tampereen ja Uumajan kanssa $\cdot$ AWS $\cdot$ Databricks ja Spark
+$\cdot$ Power BI --- ratingmallin visualisointi ja säännöllinen raportointi $\cdot$ Elastic, SPSS,
+Linux (Fedora, Kali)}
+
+\cvitem{Toimialaosaaminen}{BCBS~239, viranomaisraportointi (FINREP, COREP, AnaCredit) laskennasta
+toimitukseen asti, vakavaraisuus, rahanpesun estäminen ja asiakkaan tunteminen (AML/KYC), OSINT, GDPR,
+NIS2, EU:n tekoälyasetus, MDR, rekisteri- ja potilastietoaineistot, avoin data}
+}
+
+\newcommand{\EntryOP}{
+\cventry{10/2020--}{Data Scientist / compliance-analyytikko}{\textsc{OP Ryhmä}}{Helsinki \& Kuopio (etä)}{}{
+Compliance-analytiikkaa kahdessa tehtävässä: ensin ryhmän pankkien valvonnallinen pisteytys, sitten prudential compliance.
+\begin{itemize}
+\item Rakensin ryhmän compliance-ratingmallin, jossa osuuspankit pisteytettiin välillä 0--100 kolmessa kategoriassa (sijoituspalvelut, rahanpesun estäminen sekä hyvä hallinto ja osaaminen). Syötteinä indikaattoridata (tuntemistietojen laatu, koulutusosallistuminen), valvontahavainnot ja sääntöpohjaiset leikkurit määritellyistä puutteista. Malli kattoi 130 osuuspankkia käyttöönotossa ja 92 neljä vuotta myöhemmin fuusioiden edetessä.
+\item Kirjoitin tekstinlouhintatyökaluja compliance officerien tueksi, mm.\ puolivuosittain ajetun skriptin, joka kävi läpi edellisen puolen vuoden sijoitusneuvottelumuistiot ja poimi vapaasta tekstistä suositellut tuotteet ja suosituksen (osta/myy/pidä). Muistiot kolmella kielellä (suomi, ruotsi, englanti) ja kahdessa asiakassegmentissä, joilla eri tuotevalikoima.
+\item Prudential compliance (BCBS~239, vakavaraisuussääntely): viranomaisraporttien reverse engineering, data lineage -mallinnus, metatiedon ja aineiston laadun analytiikka, ml.\ tiedon laadun poikkeamatikettien ja niiden käsittelyaikojen analyysi.
+\item Opetin koneoppimismalleja tunnistamaan riskitapahtumia compliance-aineistosta.
+\ifconsulting\item Täysin hajautettu työmalli Kuopiosta helsinkiläisiin tiimeihin.\else\item Nimikkeet: data-analyytikko (10/2020--09/2024), compliance officer (10/2024--08/2025), data-analyytikko (09/2025--). Täysin hajautettu työmalli Kuopiosta.\fi
+\end{itemize}}
+}
+
+\newcommand{\EntryOwn}{
+\cventry{06/2022--}{Yrittäjä ja pääkonsultti}{\textsc{Oma toiminimi, Y-tunnus 3294018-7}}{Siilinjärvi (etä)}{}{
+Itsenäinen data science -konsultointi: bayesilainen mallinnus, kausaalipäättely, avoimen datan analytiikka ja OSINT.
+\begin{itemize}
+\item Asiakkaita mm.\ Tampereen yliopiston silmäkeskus, Uumajan yliopisto, hyvinvointialueita ja startup-yrityksiä; kahdesta yhteistyöstä syntyi vertaisarvioitu julkaisu.
+\item Tyypilliset toimeksiannot: ennustemallit, kausaali- ja kontrafaktuaalianalyysit, datan validointi, visualisointi ja toistettava raportointi.
+\item Kirjoittanut white paperit bayesilaisesta kontrafaktuaalianalyysistä sekä siitä, mitä EU:n tekoälyasetus vaatii mallin validoinnilta ja suorituskyvyn todentamiselta; kohderyhmänä terveysteknologian pk-yritykset.
+\item Lisäksi matematiikan ja fysiikan korkeakouluopetusta.
+\end{itemize}}
+}
+
+\newcommand{\SecExperience}{
+\section{Työkokemus}
+
+% Konsulttiversio aloittaa siitä toiminnasta, jonka asiakas ostaisi;
+% työnhakuversio nykyisestä työsuhteesta.
+\ifconsulting\EntryOwn\EntryOP\else\EntryOP\EntryOwn\fi
+
+\cventry{01/2017--10/2020}{Tilastotutkija / Data Scientist}{\textsc{Terveyden ja hyvinvoinnin laitos (THL)}}{Helsinki}{}{
+Analytiikkaa potilastieto- ja kyselyaineistoilla, suurten salassa pidettävien tietomassojen käsittelyä.
+\begin{itemize}
+\item Rakensin palvelunkäytön ennustemalleja, aluksi HUSin ja Vaasan alueen käyttöön; koronapandemian aikana ne välitettiin sosiaali- ja terveysministeriön kautta sairaanhoitopiirien käyttöön valtakunnallisesti.
+\item Lääkekulutuksen mallinnusta lääkealan kumppaneiden kanssa, mm.\ A10A-luokan insuliinien kulutusmalli Lääketietokeskuksen kanssa sekä analyyseja Nordic Healthcare Groupille ja kansainvälisille lääkeyhtiöille.
+\item Useita vertaisarvioituja julkaisuja, mm.\ alla listattu syväoppimistyö 1,4 miljoonan potilaan aineistolla.
+\item Pilotoin viranomaisten yhteistä turvallista laskentaympäristöä; toimin yhteyshenkilönä startup-yrityksille. Opetin R-ohjelmointia ja ohjasin opinnäytetöitä.
+\item Työkalut: R (Shiny, Sweave automaattiraportointiin), Oracle SQL, Python, Power BI.
+\end{itemize}}
+
+\cventry{04/2015--01/2017}{Tilastoasiantuntija}{\textsc{Sosiaalitaito Oy}}{Järvenpää}{}{
+Sosiaali- ja terveyspalvelujen tilastollinen analyysi Länsi- ja Keski-Uudenmaan kunnille. Rakensin
+mallinnus- ja simulointityökalun sote-palveluverkon muutosten arviointiin; toteutus VBA:lla nimenomaan
+siksi, että se toimisi kuntien työasemilla ilman asennusoikeuksia ja kukin kunta pystyisi analysoimaan
+omaa dataansa itsenäisesti. Työkalut: R, VBA, Power BI.}
+
+\cventry{06/2014--03/2015}{Apurahatutkija}{\textsc{Itä-Suomen yliopisto}}{Joensuu}{}{
+Suomen kansantalouden tilinpidon stock-flow consistent -mallinnus sekä Suomen evankelis-luterilaisen kirkon
+talouden tutkimus; molemmat toteutettu Matlabilla ja Simulinkilla.}
+
+\cventry{09/2013--10/2013}{Avustaja}{\textsc{Euroopan parlamentti}}{Bryssel, Belgia}{}{
+Parlamentaariseen päätöksentekoon ja lainsäädäntöprosesseihin liittyvää analytiikkaa. Työkalut: R ja Java.}
+
+% 2010-2016 opetus- ja kustannustyö: kiinnostaa työnantajaa, ei asiakasta.
+\ifconsulting\else
+\subsection{Aiemmin: opetus ja kustannustyö}
+
+\cvitem{2010--2016}{\textbf{Oppikirjailija ja toimittaja}, e-Oppi Oy (2015--2016) --- kirjoitin sähköisen
+oppikirjan pitkään matematiikkaan ja toimitin 7.~luokan matematiikan oppikirjan $\cdot$
+\textbf{Ohjaaja ja koordinaattori}, Joensuun Tiedeseura (2010--2015) --- tiedekerhot ja -leirit
+alakouluikäisille $\cdot$ \textbf{Sijaisopettaja}, useita kouluja Itä-Suomessa (2010--2013) ---
+matematiikka, fysiikka, kemia ja tietotekniikka.}
+\fi
+}
+
+\newcommand{\SecOpenSource}{
+\section{Avoin lähdekoodi ja R-pakettikehitys}
+
+\cvitem{\textbf{lexverse}}{\emph{lexverse}-ekosysteemin tekijä ja arkkitehti: R-paketit, jotka tarjoavat
+yhtenäisen rajapinnan oikeudelliseen ja sääntelydataan eri lainkäyttöalueilla --- tidyversen kaltainen
+standardi oikeudellisen datan analytiikkaan. Yhtenäiset tibble-rakenteet, offline-testattavat
+API-asiakkaat ja rajat ylittävä tutkimus, joka nyt kaatuu työkalujen puutteeseen.}
+
+\cvitem{\textbf{finlex}}{CRAN. Asiakas Suomen Finlex-avoimen datan rajapintaan: säädökset, ajantasaiset
+tekstit, metatiedot ja muutosketjut. \url{https://cran.r-project.org/package=finlex}}
+
+\cvitem{\textbf{swelex}}{CRAN. Asiakas Ruotsin valtiopäivien (Riksdagen) avoimen datan rajapintaan.
+\url{https://cran.r-project.org/package=swelex}}
+
+\cvitem{\textbf{danlex}}{CRAN. Asiakas Tanskan Retsinformationin ELI-rajapintaan.
+\url{https://cran.r-project.org/package=danlex}}
+
+\cvitem{\textbf{eurlex}}{Kehittäjä --- toiseksi aktiivisin kontribuoija commit-historian perusteella.
+Vedin SPARQL-kyselyrakentajan arkkitehtuuriuudistuksen, joka varmennettiin tavu tavulta identtiseksi
+aiemman toteutuksen kanssa 44 testin kehikolla, ja kirjoitin 23 testin \texttt{testthat}-paketin sekä
+roxygen2-dokumentaation. Osa paketin paluuta CRANiin.}
+
+\cvitem{\textbf{Käytännöt}}{Jatkuva integraatio GitHub Actionsilla, mockatut HTTP-testit
+(\texttt{httptest2}, \texttt{testthat}), pkgdown-dokumentaatio, CRANin käytännöt sekä koodikatselmoinnit
+kansainvälisten ylläpitäjien kanssa eri aikavyöhykkeillä.}
+}
+
+\newcommand{\SecPublications}{
+\section{Kirja, esitelmät ja julkaisut}
+
+\cvitem{Kirja}{\emph{Bayesian Counterfactuals with R} --- sopimus kustantajan \textbf{Chapman \& Hall/CRC}
+kanssa (tulossa).}
+
+\cvitem{2026}{When One Hundredth of a Second Matters: Bayesian Counterfactual Modeling in R.
+\emph{useR!~2026 -konferenssi}, Varsova, Puola.}
+
+\cvitem{2025}{Prototype master protocol for benchmarking of real-world follow-up data in glaucoma.
+\emph{Acta Ophthalmologica} 103:539--551. 4121 glaukoomapotilaan aineisto Tampereen yliopistollisesta
+sairaalasta vertailtuna kuuteen julkaistuun tosielämän aineistoon Ruotsista ja Englannista.
+\small\url{https://doi.org/10.1111/aos.17453}}
+
+\cvitem{2025}{Users of reimbursed glaucoma medications in Finland in 1986--2023: a nationwide study.
+\emph{Acta Ophthalmologica} 103:348--356. Kelan korvausrekisteri, 193\,082 potilasta 37 vuoden ajalta.
+\small\url{https://doi.org/10.1111/aos.16803}}
+
+\cvitem{2022}{Impact of a CE certification-marked medical software sensor on COVID-19 pandemic
+progression prediction. \emph{JMIR Formative Research} 6(3):e35181. 414\,477 oirearvion vastausta
+yhdistettynä kansallisiin hoitoilmoitusrekistereihin.
+\small\url{https://doi.org/10.2196/35181}}
+
+\cvitem{2021}{Assessing health gradient with different equivalence scales for household income ---
+a sensitivity analysis. \emph{SSM --- Population Health} 15:100892. Järjestetty probit-malli Suomen
+EU-SILC 2017 -aineistolla ($N = 9406$). \small\url{https://doi.org/10.1016/j.ssmph.2021.100892}}
+
+\cvitem{2020}{Predicting utilization of healthcare services from individual disease trajectories using
+RNNs with multi-headed attention. \emph{PMLR} 116:93--111 (ML4H-työpaja, NeurIPS~2019).
+1,4 miljoonan yli 65-vuotiaan suomalaisen potilaskertomusaineisto; noin 10\,\% parempi $R^2$ kuin
+lukumääräpohjaisilla verrokkimalleilla ja 38\,\% nopeampi konvergenssi.
+\small\url{https://proceedings.mlr.press/v116/kumar20a.html}}
+
+\cvitem{2019}{Assessing the quality of Finnish primary health care registers. \emph{9th Nordic Conference
+of Epidemiology and Register-Based Health Research}, Tampereen yliopisto.}
+
+\cvitem{2017}{National accounts as a stock-flow consistent system, part 1: the real accounts.
+\emph{Fourth Nordic Post-Keynesian Conference}, Aalborgin yliopisto. Viiden makrosektorin simulointimalli,
+joka tuottaa aikaurat 59 makrosuureelle, kalibroituna Suomen kansantalouden tilinpitoon 1975--2012.
+\small\url{https://arxiv.org/abs/2012.11282}}
+
+\cvitem{2017}{SIFT --- research of patient flows and structures in health and social care services in
+three Finnish cities, 2009--2015. \emph{International Journal of Integrated Care}.
+\small\url{https://doi.org/10.5334/ijic.3418}}
+
+\cvitem{Kirjoittaminen}{\emph{Maailma on jakauma} --- blogi avoimesta datasta, bayesilaisista menetelmistä
+ja toistettavasta analyysistä: \url{https://www.kristianvepsalainen.com}}
+}
+
+\newcommand{\SecEducation}{
+\section{Koulutus}
+
+\cventry{2020--2024}{Insinööri (ylempi AMK), kyberturvallisuus}{Jyväskylän ammattikorkeakoulu}{Jyväskylä}{}{
+Painopisteinä tietoturvatestaus ja -auditointi sekä niiden dokumentointi.
+\newline\emph{Opinnäytetyö:} Cyber intelligence for anti-money laundering, counter-terrorism financing
+and know your customer (47~s.). Tapaustutkimus avoimen digitaalisen tiedustelun (CYBINT/OSINT)
+soveltamisesta rahanpesun estämiseen ja asiakkaan tuntemiseen finanssialalla; testit anonyymeillä
+henkilö- ja yrityskohteilla pankkisalaisuuden vuoksi. Viitattu kahdessa myöhemmässä julkaisussa, mm.\
+Springerin tekoälyä ja terrorismintorjuntaa käsittelevässä teoksessa (2025) --- poikkeuksellista tämän
+tason opinnäytetyölle. Ohjaajat: Tuomo Sipola \& Mika Rantonen.
+\small\url{https://urn.fi/URN:NBN:fi:amk-202404298239}}
+
+\cventry{2012--2016}{Filosofian maisteri}{Itä-Suomen yliopisto}{Joensuu}{}{
+Pääaine: matematiikka. Sivuaine: tuotantotalous.
+\newline\emph{Pro gradu:} Kansantalouden tilinpidon mallintaminen differenssiyhtälöillä --- Matlab-malli
+rahavirroista kansantalouden sektorien välillä. Ohjaajat: Jukka Tuomela \& Matti Estola.}
+
+\cventry{2006--2012}{Luonnontieteiden kandidaatti}{Itä-Suomen yliopisto}{Joensuu}{}{
+Pääaine: matematiikka. Sivuaineet: tietojenkäsittelytiede (aineopinnot), tilastotiede (laajat aineopinnot),
+kansantaloustiede ja yrittäjyys.}
+}
+
+\newcommand{\SecTail}{
+\section{Kielitaito, luottamustoimet ja harrastukset}
+
+\cvitem{Kielet}{\textbf{Suomi} äidinkieli $\cdot$ \textbf{Englanti} erinomainen, työkielenä kymmenen
+vuotta $\cdot$ \textbf{Espanja} keskitaso (B1--B2), aktiivisessa opiskelussa $\cdot$ \textbf{Ruotsi}
+perusteet}
+
+\cvitem{Hallitukset}{STEFIM ry (teollisuus- ja finanssimatematiikka) 2015--2016 $\cdot$ Opiskelija-asunnot
+Oy Joensuun Elli 2013--2017 $\cdot$ Joensuun Rotaract, varapuheenjohtaja 2013--2014}
+
+\cvitem{Harrastukset}{Laitesukellus (CMAS~P1, nitrox) $\cdot$ miekkailu (kalpa, säilä) $\cdot$
+radioamatööritoiminta OH7EEP $\cdot$ avoimen datan edistäminen}
+}
+
+%----------------------------------------------------------------------------------------
+%	ESITYSJÄRJESTYS
+%----------------------------------------------------------------------------------------
+
+\ifonepager\else
+\ifconsulting
+  % Asiakkaan lukujärjestys: mitä teen, todiste että se on olemassa, miten, kenelle.
+  \SecOpenSource
+  \SecSkills
+  \SecExperience
+  \SecPublications
+  \SecEducation
+  \SecTail
+\else
+  % Rekrytoijan lukujärjestys: osaaminen, sitten kronologia.
+  \SecSkills
+  \SecExperience
+  \SecOpenSource
+  \SecPublications
+  \SecEducation
+  \SecTail
+\fi
+\fi
+
+\end{document}
