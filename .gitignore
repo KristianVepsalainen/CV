@@ -52,3 +52,6 @@ rsconnect/
 contact-fi.tex
 contact-en.tex
 *.pdf
+
+#logs
+build-error.log
