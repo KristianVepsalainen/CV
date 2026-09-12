@@ -1,0 +1,503 @@
+---
+title: "Where should robot delivery go next?"
+subtitle: "A store-level suitability score built from open data"
+author: "Kristian Vepsäläinen"
+date: today
+lang: en
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+  pdf:
+    toc: false
+execute:
+  warning: false
+  message: false
+  cache: true
+params:
+  radius_m: 3000
+  n_shortlist: 20
+  overpass_timeout: 300
+---
+
+```{r setup}
+#| include: false
+library(here)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(purrr)
+library(sf)
+library(fst)
+library(osmdata)
+library(geofi)
+library(ggplot2)
+library(knitr)
+
+sf_use_s2(FALSE)
+
+cache_dir <- here("data", "cache")
+dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Simple on-disk cache: Overpass queries are slow and should not be
+# re-run on every render.
+cached <- function(name, expr) {
+  path <- file.path(cache_dir, paste0(name, ".rds"))
+  if (file.exists(path)) return(readRDS(path))
+  val <- force(expr)
+  saveRDS(val, path)
+  val
+}
+```
+
+## The question
+
+In Finland, robot delivery operates out of S Group grocery stores within a
+radius of roughly three kilometres, travelling along pedestrian and cycle
+paths. The question is which not-yet-served stores should be activated
+next, and on what grounds.
+
+The answer is built entirely from open data. That means internal order and
+telemetry data is absent, so this is a screening exercise rather than a
+final decision. The section [What internal data would change] sets out
+which assumptions would be replaced by measurement.
+
+## Data
+
+| Dataset | Source | Used for |
+|---|---|---|
+| Paavo postal code statistics | Statistics Finland | Population, age structure, income |
+| Postal area geometries | Statistics Finland / `geofi` | Allocating population to service areas |
+| Stores, pedestrian network, crossings | OpenStreetMap / Overpass | Locations, drivability |
+| Current robot locations | Regional co-op press releases | Model validation |
+
+### Paavo
+
+```{r paavo}
+paavo_raw <- read_fst(here("data", "paavo", "paavo.fst"))
+
+# Paavo ships Finnish column names containing spaces and a two-letter group
+# code in parentheses. Everything downstream uses only the English names on
+# the left-hand side of this mapping.
+paavo_map <- c(
+  zip              = "Postinumeroalue",
+  year             = "Vuosi",
+  area_m2          = "Postinumeroalueen pinta-ala",
+  population       = "Asukkaat yhteensä (HE)",
+  mean_age         = "Asukkaiden keski-ikä (HE)",
+  age_25_29        = "25-29-vuotiaat (HE)",
+  age_30_34        = "30-34-vuotiaat (HE)",
+  age_35_39        = "35-39-vuotiaat (HE)",
+  age_40_44        = "40-44-vuotiaat (HE)",
+  age_45_49        = "45-49-vuotiaat (HE)",
+  age_50_54        = "50-54-vuotiaat (HE)",
+  age_55_59        = "55-59-vuotiaat (HE)",
+  age_60_64        = "60-64-vuotiaat (HE)",
+  households       = "Taloudet yhteensä (TE)",
+  hh_young_single  = "Nuorten yksinasuvien taloudet (TE)",
+  hh_small_child   = "Pienten lasten taloudet (TE)",
+  hh_rental        = "Vuokra-asunnoissa asuvat taloudet (TE)",
+  hh_pensioner     = "Eläkeläisten taloudet (TE)",
+  dwellings        = "Asunnot (RA)",
+  dwell_apartment  = "Kerrostaloasunnot (RA)",
+  median_income    = "Asukkaiden mediaanitulot (HR)",
+  purchasing_power = "Asukkaiden ostovoimakertymä (HR)",
+  students         = "Opiskelijat (PT)",
+  jobs             = "Työpaikat yhteensä (TP)"
+)
+
+missing <- setdiff(paavo_map, names(paavo_raw))
+if (length(missing) > 0) {
+  stop("Paavo columns missing, fix paavo_map: ",
+       paste(missing, collapse = ", "))
+}
+
+paavo <- paavo_raw |>
+  select(all_of(paavo_map)) |>
+  # The file holds several vintages; without this every postal area would
+  # enter the join more than once and population would multiply.
+  filter(year == max(year, na.rm = TRUE)) |>
+  mutate(
+    zip = str_pad(as.character(zip), 5, pad = "0"),
+    working_age = age_25_29 + age_30_34 + age_35_39 + age_40_44 +
+                  age_45_49 + age_50_54 + age_55_59 + age_60_64
+  ) |>
+  select(-starts_with("age_"))
+
+message("Paavo vintage in use: ", unique(paavo$year),
+        " | postal areas: ", nrow(paavo))
+
+# Sanity check on the area unit. Paavo reports area in square metres, so a
+# median in the millions is expected; a median in the thousands would mean
+# hectares and every density below would be off by four orders of magnitude.
+message("Median postal area: ", format(median(paavo$area_m2, na.rm = TRUE),
+        big.mark = " "))
+
+zip_geom <- cached("zip_geom", {
+  geofi::get_zipcodes(year = 2023) |>
+    select(zip = posti_alue, geom = geometry) |>
+    st_transform(3067)
+})
+
+zips <- zip_geom |>
+  left_join(paavo, by = "zip") |>
+  filter(!is.na(population), population > 0) |>
+  st_make_valid() |>
+  mutate(zip_area = as.numeric(st_area(geometry)))
+```
+
+Paavo reports population by postal area, but a service area is a circle
+around a store. The two are intersected and population is allocated in
+proportion to overlapping area. This assumes population is spread evenly
+within a postal area, which is wrong in sparsely settled regions and
+overstates stores on the edge of large areas. The 250 m population grid
+would fix this at the cost of a heavier download and more processing; in
+this version the assumption is stated rather than hidden.
+
+### Stores from OpenStreetMap
+
+```{r stores}
+# S Group chains. Sale and S-market have served as robot origin points;
+# Prisma is included because its assortment supports online orders.
+sgroup_brands <- c("S-market", "Prisma", "Sale", "Alepa", "Food Market Herkku")
+
+fetch_stores <- function(brand) {
+  opq(bbox = c(19.0, 59.7, 31.6, 70.1), timeout = params$overpass_timeout) |>
+    add_osm_features(features = c(
+      sprintf('"brand"="%s"', brand),
+      sprintf('"name"~"^%s"', brand)
+    )) |>
+    osmdata_sf()
+}
+
+stores_raw <- cached("stores_osm", {
+  map(sgroup_brands, function(b) {
+    res <- tryCatch(fetch_stores(b), error = function(e) NULL)
+    if (is.null(res)) return(NULL)
+    pts <- res$osm_points
+    polys <- res$osm_polygons
+    bind_rows(
+      if (!is.null(pts) && nrow(pts) > 0) st_as_sf(pts) else NULL,
+      if (!is.null(polys) && nrow(polys) > 0) st_centroid(st_as_sf(polys)) else NULL
+    ) |>
+      mutate(chain = b)
+  }) |>
+    bind_rows()
+})
+
+stores <- stores_raw |>
+  filter(!is.na(name)) |>
+  select(any_of(c("osm_id", "name", "brand", "operator", "addr:city", "chain"))) |>
+  rename(city = any_of("addr:city")) |>
+  st_transform(3067) |>
+  distinct(name, chain, .keep_all = TRUE)
+
+# Check this before trusting any number downstream: OSM brand and name
+# tagging is uneven, and a misclassified chain propagates straight into
+# the result.
+stores |>
+  st_drop_geometry() |>
+  count(chain, sort = TRUE) |>
+  kable(caption = "Identified stores by chain")
+```
+
+Chain identification relies on OSM `brand` and `name` tags, whose coverage
+varies. If a chain looks clearly undercounted above, that is a tagging
+problem rather than a real absence, and it should be fixed before the
+results are read.
+
+### Current robot locations
+
+```{r served}
+# Compiled from regional co-op and SOK press releases. Complete the gaps;
+# this list is the model's only validation anchor.
+served_towns <- tribble(
+  ~city,           ~coop,
+  "Helsinki",      "HOK-Elanto",
+  "Espoo",         "HOK-Elanto",
+  "Vantaa",        "HOK-Elanto",
+  "Tampere",       "Pirkanmaa",
+  "Turku",         "TOK",
+  "Kaarina",       "TOK",
+  "Naantali",      "TOK",
+  "Raisio",        "TOK",
+  "Parainen",      "TOK",
+  "Uusikaupunki",  "TOK",
+  "Pori",          "Satakunta",
+  "Rauma",         "Satakunta",
+  "Jyväskylä",     "Keskimaa",
+  "Oulu",          "Arina",
+  "Lahti",         "Hämeenmaa",
+  "Heinola",       "Hämeenmaa",
+  "Riihimäki",     "Hämeenmaa",
+  "Hämeenlinna",   "Hämeenmaa",
+  "Forssa",        "Hämeenmaa",
+  "Kotka",         "Kymen Seutu",
+  "Kouvola",       "Kymen Seutu",
+  "Siilinjärvi",   "PeeÄssä",
+  "Kuopio",        "PeeÄssä",
+  "Joensuu",       "PKO"
+)
+
+stores <- stores |>
+  mutate(served = city %in% served_towns$city)
+```
+
+## Scoring
+
+Five components, each normalised to the unit interval. The weights are
+explicit and live in one place, so that anyone can dispute them
+individually. Demand and customer mix are kept apart deliberately: a large
+suburb of homeowning pensioners and a small student district can produce
+the same headcount and very different order volumes.
+
+```{r components}
+weights <- c(demand       = 0.30,  # how many people are within reach
+             customer_mix = 0.15,  # how many of them are likely orderers
+             drivability  = 0.25,  # can the robot actually get there
+             density      = 0.20,  # deliveries per kilometre travelled
+             crossings    = 0.10)  # road crossings as a risk discount
+
+buffers <- stores |>
+  st_buffer(params$radius_m) |>
+  mutate(buffer_id = row_number())
+
+# Population inside the service area, area-weighted
+pop_in_service_area <- st_intersection(
+  buffers |> select(buffer_id),
+  zips |> select(zip, population, working_age, households, hh_young_single,
+                 hh_small_child, hh_rental, dwell_apartment, dwellings,
+                 students, jobs, purchasing_power, zip_area)
+) |>
+  mutate(share = as.numeric(st_area(geometry)) / zip_area) |>
+  st_drop_geometry() |>
+  group_by(buffer_id) |>
+  summarise(
+    across(
+      c(population, working_age, households, hh_young_single, hh_small_child,
+        hh_rental, dwell_apartment, dwellings, students, jobs,
+        purchasing_power),
+      ~ sum(.x * share, na.rm = TRUE)
+    ),
+    .groups = "drop"
+  )
+```
+
+```{r osm_network}
+# Pedestrian network and crossings are fetched only for leading
+# candidates: pulling the whole country from Overpass is neither
+# necessary nor polite.
+candidates <- buffers |>
+  left_join(pop_in_service_area, by = "buffer_id") |>
+  filter(!is.na(population)) |>
+  arrange(desc(population)) |>
+  slice_head(n = 120)
+
+fetch_network <- function(geom_wgs) {
+  bb <- st_bbox(geom_wgs)
+  q <- opq(bbox = as.numeric(bb), timeout = params$overpass_timeout)
+  paths <- tryCatch(
+    q |> add_osm_feature("highway",
+        c("footway", "path", "pedestrian", "living_street", "cycleway")) |>
+      osmdata_sf(),
+    error = function(e) NULL)
+  crossings <- tryCatch(
+    q |> add_osm_feature("highway", "crossing") |> osmdata_sf(),
+    error = function(e) NULL)
+  list(paths = paths, crossings = crossings)
+}
+
+network <- cached("network_osm", {
+  candidates |>
+    st_transform(4326) |>
+    st_geometry() |>
+    map(fetch_network)
+})
+
+network_metrics <- map2_dfr(network, candidates$buffer_id, function(v, id) {
+  path_km <- 0
+  if (!is.null(v$paths) && !is.null(v$paths$osm_lines) &&
+      nrow(v$paths$osm_lines) > 0) {
+    path_km <- v$paths$osm_lines |>
+      st_transform(3067) |>
+      st_length() |>
+      sum() |>
+      as.numeric() / 1000
+  }
+  n_crossings <- 0
+  if (!is.null(v$crossings) && !is.null(v$crossings$osm_points)) {
+    n_crossings <- nrow(v$crossings$osm_points)
+  }
+  tibble(buffer_id = id, path_km = path_km, n_crossings = n_crossings)
+})
+```
+
+```{r scoring}
+norm01 <- function(x) {
+  # Winsorised at the 5th and 95th percentiles: one large city must not
+  # flatten the rest of the distribution to zero.
+  lo <- quantile(x, 0.05, na.rm = TRUE)
+  hi <- quantile(x, 0.95, na.rm = TRUE)
+  pmin(pmax((x - lo) / (hi - lo), 0), 1)
+}
+
+scored <- candidates |>
+  st_drop_geometry() |>
+  left_join(network_metrics, by = "buffer_id") |>
+  mutate(
+    area_km2      = pi * (params$radius_m / 1000)^2,
+    pop_density   = population / area_km2,
+    path_density  = path_km / area_km2,
+    crossing_rate = n_crossings / pmax(path_km, 1),
+
+    # Share of residents in the household types that dominate quick
+    # commerce elsewhere: young people living alone, households with small
+    # children, and students.
+    orderer_share = (hh_young_single + hh_small_child + students) /
+                     pmax(population, 1),
+
+    c_demand       = norm01(working_age),
+    c_customer_mix = norm01(orderer_share),
+    c_drivability  = norm01(path_density),
+    c_density      = norm01(pop_density),
+    # Crossings are a risk, so this component is inverted
+    c_crossings    = 1 - norm01(crossing_rate),
+
+    score = weights["demand"]       * c_demand +
+            weights["customer_mix"] * c_customer_mix +
+            weights["drivability"]  * c_drivability +
+            weights["density"]      * c_density +
+            weights["crossings"]    * c_crossings
+  )
+```
+
+## Validation
+
+The only external check available is whether the score recognises
+locations already in operation. The model was not built to identify them.
+
+```{r validation}
+validation <- scored |>
+  mutate(rank_pos = rank(-score))
+
+auc <- with(validation, {
+  p <- score[served]; n <- score[!served]
+  mean(outer(p, n, ">")) + 0.5 * mean(outer(p, n, "=="))
+})
+
+validation |>
+  group_by(served) |>
+  summarise(
+    n = n(),
+    median_score = round(median(score), 3),
+    median_rank  = round(median(rank_pos)),
+    .groups = "drop"
+  ) |>
+  kable(caption = sprintf("Separation, AUC = %.2f", auc))
+
+# A single anchor: according to public reporting, the S-market in central
+# Siilinjärvi has been the most active robot origin point in Finland.
+validation |>
+  filter(str_detect(name, "Siilinjärv")) |>
+  select(name, city, population, path_km, score, rank_pos) |>
+  kable(caption = "Where Siilinjärvi lands in the model")
+```
+
+If the AUC sits near 0.5, the model does not separate and its components
+are the wrong ones. If it is clearly above 0.7, features computed from
+open data explain existing siting decisions well enough that the same
+features can be used to propose the next ones.
+
+## Leading candidates
+
+```{r shortlist}
+shortlist <- scored |>
+  filter(!served) |>
+  arrange(desc(score)) |>
+  slice_head(n = params$n_shortlist) |>
+  transmute(
+    Store = name, City = city,
+    `Population 3 km` = round(population),
+    `Path km` = round(path_km),
+    Score = round(score, 3)
+  )
+
+kable(shortlist, caption = "Best not-yet-served stores")
+```
+
+```{r rollup}
+# The commercial decision is made with a regional co-op, not one store at
+# a time.
+scored |>
+  filter(!served) |>
+  group_by(City = city) |>
+  summarise(
+    Stores = n(),
+    `Combined population` = round(sum(population)),
+    `Median score` = round(median(score), 3),
+    .groups = "drop"
+  ) |>
+  arrange(desc(`Median score`)) |>
+  slice_head(n = 15) |>
+  kable(caption = "By town: how many stores come with one negotiation")
+```
+
+```{r map}
+#| fig-height: 7
+municipalities <- cached("municipalities", geofi::get_municipalities(year = 2023))
+
+ggplot() +
+  geom_sf(data = municipalities, fill = "grey96", colour = "white",
+          linewidth = 0.1) +
+  geom_sf(data = scored |>
+            left_join(select(buffers, buffer_id), by = "buffer_id") |>
+            st_as_sf() |> st_centroid(),
+          aes(colour = score, shape = served), size = 2) +
+  scale_colour_viridis_c(option = "magma", direction = -1) +
+  scale_shape_manual(values = c(`FALSE` = 16, `TRUE` = 4),
+                     labels = c("Candidate", "In operation")) +
+  labs(colour = "Score", shape = NULL) +
+  theme_void()
+```
+
+## What internal data would change
+
+Three places where open data stands in for measurement, and where the
+score would likely shift materially:
+
+**Actual delivery time would replace path density.** Kilometres of
+pedestrian path is a crude proxy for what is really wanted: whether the
+robot arrives within a time that keeps the customer happy. Realised
+travel time from telemetry, modelled as a function of network structure,
+would calibrate this component directly.
+
+**Order volume would replace population count.** Working-age population
+within the radius is a proxy for demand. Order density per resident in
+existing service areas would show which demographic features actually
+predict demand, and the demand component could be estimated rather than
+weighted by hand.
+
+**Cost per delivery would settle the weights.** The weights here are set
+by judgement. With unit economics data they could be chosen so that the
+score predicts contribution rather than volume, which would most likely
+move the shortlist toward dense smaller towns.
+
+Winter is absent from this version entirely. Days of snow cover and days
+below freezing, from the Finnish Meteorological Institute's open data,
+would be a natural fifth component, and it is the one factor no
+international benchmark accounts for.
+
+## Limitations
+
+- Population is allocated from postal areas by area weighting, which
+  overstates edge stores in large, sparsely settled areas.
+- OSM coverage varies regionally; pedestrian network digitisation is
+  better in cities than in smaller towns, which biases the score toward
+  cities systematically.
+- Gradient and surface quality are absent. They determine whether the
+  robot can physically get there and would require an elevation model.
+- The list of current locations is compiled from press releases and may
+  be incomplete, which weakens the validation in both directions.
+- Store picking capacity is a binding constraint that open data cannot
+  see at all.

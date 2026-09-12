@@ -1,0 +1,445 @@
+---
+title: "Mihin robottijakelu kannattaa viedä seuraavaksi?"
+subtitle: "Myymälätason soveltuvuuspisteytys avoimella datalla"
+author: "Kristian Vepsäläinen"
+date: today
+lang: fi
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+  pdf:
+    toc: false
+execute:
+  warning: false
+  message: false
+  cache: true
+params:
+  radius_m: 3000
+  n_shortlist: 20
+  overpass_timeout: 300
+---
+
+```{r setup}
+#| include: false
+library(here)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(purrr)
+library(sf)
+library(fst)
+library(osmdata)
+library(geofi)
+library(ggplot2)
+library(knitr)
+
+sf_use_s2(FALSE)
+
+cache_dir <- here("data", "cache")
+dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Yksinkertainen levylle tallentava välimuisti: Overpass-kyselyt ovat hitaita
+# eikä niitä pidä ajaa uudelleen jokaisella renderöinnillä.
+cached <- function(name, expr) {
+  path <- file.path(cache_dir, paste0(name, ".rds"))
+  if (file.exists(path)) return(readRDS(path))
+  val <- force(expr)
+  saveRDS(val, path)
+  val
+}
+```
+
+## Kysymys
+
+Robottijakelu toimii Suomessa S-ryhmän myymälöistä noin kolmen kilometrin
+säteellä, kevyen liikenteen väyliä pitkin. Kysymys on, mitkä vielä
+palvelemattomat myymälät kannattaisi ottaa seuraavaksi käyttöön ja millä
+perusteella.
+
+Vastaus rakennetaan kokonaan avoimesta datasta. Se tarkoittaa, että sisäinen
+tilaus- ja telemetriadata puuttuu, ja siksi tämä on lähtökohtien
+esikarsinta, ei lopullinen päätös. Luvussa [Mitä sisäinen data muuttaisi]
+on eritelty, mitkä oletukset korvautuisivat mittauksella.
+
+## Aineistot
+
+| Aineisto | Lähde | Käyttö |
+|---|---|---|
+| Paavo-postinumeroalueet | Tilastokeskus | Väestö, ikärakenne, tulot |
+| Postinumeroalueiden geometria | Tilastokeskus / `geofi` | Väestön allokointi palvelualueelle |
+| Myymälät, kevyen liikenteen väylät, suojatiet | OpenStreetMap / Overpass | Sijainnit, kuljettavuus |
+| Nykyiset robottialueet | Osuuskauppojen tiedotteet | Mallin validointi |
+
+### Paavo
+
+```{r paavo}
+paavo_raw <- read_fst(here("data", "paavo", "paavo.fst"))
+
+# Paavon sarakenimet vaihtelevat vuosikerroittain. Tarkista tämä kartta
+# kerran; kaikki muu koodi käyttää vain näitä nimiä.
+paavo_map <- c(
+  pono      = "postinumeroalue",  # esim. "posti_alue" tai "pono"
+  nimi      = "nimi",
+  vaesto    = "he_vakiy",
+  ika_25_44 = "he_25_44",
+  ika_45_64 = "he_45_64",
+  ika_yli74 = "he_75_84",
+  taloudet  = "te_taly",
+  opiskelij = "pt_opisk",
+  tulot_med = "hr_mtu"
+)
+
+missing <- setdiff(paavo_map, names(paavo_raw))
+if (length(missing) > 0) {
+  stop("Paavo-sarakkeita puuttuu, korjaa paavo_map: ",
+       paste(missing, collapse = ", "))
+}
+
+paavo <- paavo_raw |>
+  select(all_of(paavo_map)) |>
+  mutate(pono = str_pad(as.character(pono), 5, pad = "0"))
+
+zip_geom <- cached("zip_geom", {
+  geofi::get_zipcodes(year = 2023) |>
+    select(pono = posti_alue, geom = geometry) |>
+    st_transform(3067)
+})
+
+zips <- zip_geom |>
+  left_join(paavo, by = "pono") |>
+  filter(!is.na(vaesto), vaesto > 0) |>
+  mutate(pinta_ala = as.numeric(st_area(geometry)))
+```
+
+Paavo antaa väestön postinumeroalueittain, mutta palvelualue on ympyrä
+myymälän ympärillä. Alueet leikataan, ja väestö allokoidaan
+pinta-alapainotetusti. Tämä olettaa väestön jakautuvan tasaisesti
+postinumeroalueen sisällä, mikä on harvaan asutuilla alueilla väärin ja
+yliarvioi reuna-alueiden myymälöitä. Väestöruutuaineisto (250 m) korjaisi
+tämän, mutta lisää latauksen ja käsittelyn; tässä versiossa oletus on
+kirjattu näkyviin sen sijaan että se piilotettaisiin.
+
+### Myymälät OpenStreetMapista
+
+```{r kaupat}
+# S-ryhmän ketjut. Sale ja S-market ovat toimineet robottilähtöpisteinä;
+# Prisma on mukana, koska valikoima tukee tilauksia.
+s_brandit <- c("S-market", "Prisma", "Sale", "Alepa", "Food Market Herkku")
+
+hae_kaupat <- function(brandi) {
+  opq(bbox = c(19.0, 59.7, 31.6, 70.1), timeout = params$overpass_timeout) |>
+    add_osm_features(features = c(
+      sprintf('"brand"="%s"', brandi),
+      sprintf('"name"~"^%s"', brandi)
+    )) |>
+    osmdata_sf()
+}
+
+kaupat_raw <- cached("kaupat_osm", {
+  map(s_brandit, function(b) {
+    res <- tryCatch(hae_kaupat(b), error = function(e) NULL)
+    if (is.null(res)) return(NULL)
+    pts <- res$osm_points
+    pys <- res$osm_polygons
+    bind_rows(
+      if (!is.null(pts) && nrow(pts) > 0) st_as_sf(pts) else NULL,
+      if (!is.null(pys) && nrow(pys) > 0) st_centroid(st_as_sf(pys)) else NULL
+    ) |>
+      mutate(ketju = b)
+  }) |>
+    bind_rows()
+})
+
+kaupat <- kaupat_raw |>
+  filter(!is.na(name)) |>
+  select(any_of(c("osm_id", "name", "brand", "operator", "addr:city", "ketju"))) |>
+  rename(kunta = any_of("addr:city")) |>
+  st_transform(3067) |>
+  distinct(name, ketju, .keep_all = TRUE)
+
+# Tarkista tämä ennen kuin luotat lukuihin: OSM:n brand- ja name-tagitus on
+# epätasaista, ja väärä ketjutunnistus siirtyy suoraan lopputulokseen.
+kaupat |>
+  st_drop_geometry() |>
+  count(ketju, sort = TRUE) |>
+  kable(caption = "Tunnistetut myymälät ketjuittain")
+```
+
+Ketjutunnistus nojaa OSM:n `brand`- ja `name`-tageihin, joiden kattavuus
+vaihtelee. Jos jokin ketju näyttää yllä selvästi alimitoitetulta, se on
+tagitusongelma eikä todellinen puute, ja se kannattaa korjata ennen
+tulkintaa.
+
+### Nykyiset robottialueet
+
+```{r nykyiset}
+# Osuuskauppojen ja SOK:n tiedotteista koottu. Täydennä puuttuvat; tämä
+# lista on mallin ainoa validointiankkuri.
+nykyiset <- tribble(
+  ~kunta,          ~osuuskauppa,
+  "Helsinki",      "HOK-Elanto",
+  "Espoo",         "HOK-Elanto",
+  "Vantaa",        "HOK-Elanto",
+  "Tampere",       "Pirkanmaa",
+  "Turku",         "TOK",
+  "Kaarina",       "TOK",
+  "Naantali",      "TOK",
+  "Raisio",        "TOK",
+  "Parainen",      "TOK",
+  "Uusikaupunki",  "TOK",
+  "Pori",          "Satakunta",
+  "Rauma",         "Satakunta",
+  "Jyväskylä",     "Keskimaa",
+  "Oulu",          "Arina",
+  "Lahti",         "Hämeenmaa",
+  "Heinola",       "Hämeenmaa",
+  "Riihimäki",     "Hämeenmaa",
+  "Hämeenlinna",   "Hämeenmaa",
+  "Forssa",        "Hämeenmaa",
+  "Kotka",         "Kymen Seutu",
+  "Kouvola",       "Kymen Seutu",
+  "Siilinjärvi",   "PeeÄssä",
+  "Kuopio",        "PeeÄssä",
+  "Joensuu",       "PKO"
+)
+
+kaupat <- kaupat |>
+  mutate(palveltu = kunta %in% nykyiset$kunta)
+```
+
+## Pisteytys
+
+Neljä komponenttia, kukin normalisoitu nollan ja ykkösen välille. Painot
+ovat eksplisiittisiä ja yhdessä paikassa, jotta kuka tahansa voi kiistää
+ne erikseen.
+
+```{r komponentit}
+painot <- c(kysynta = 0.40, kuljettavuus = 0.30, tiheys = 0.20, ylitykset = 0.10)
+
+puskurit <- kaupat |>
+  st_buffer(params$radius_m) |>
+  mutate(puskuri_id = row_number())
+
+# Väestö palvelualueella, pinta-alapainotettuna
+vaesto_palvelualueella <- st_intersection(
+  puskurit |> select(puskuri_id),
+  zips |> select(pono, vaesto, ika_25_44, ika_45_64, taloudet, pinta_ala)
+) |>
+  mutate(osuus = as.numeric(st_area(geometry)) / pinta_ala) |>
+  st_drop_geometry() |>
+  group_by(puskuri_id) |>
+  summarise(
+    vaesto     = sum(vaesto * osuus, na.rm = TRUE),
+    tyoikaiset = sum((ika_25_44 + ika_45_64) * osuus, na.rm = TRUE),
+    taloudet   = sum(taloudet * osuus, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+```{r osm_verkko}
+# Kevyen liikenteen väylät ja suojatiet haetaan vain kärkiehdokkaille:
+# koko maan verkon hakeminen Overpassista ei ole tarpeen eikä kohteliasta.
+esikarsinta <- puskurit |>
+  left_join(vaesto_palvelualueella, by = "puskuri_id") |>
+  filter(!is.na(vaesto)) |>
+  arrange(desc(vaesto)) |>
+  slice_head(n = 120)
+
+hae_verkko <- function(geom_wgs) {
+  bb <- st_bbox(geom_wgs)
+  q <- opq(bbox = as.numeric(bb), timeout = params$overpass_timeout)
+  polut <- tryCatch(
+    q |> add_osm_feature("highway",
+        c("footway", "path", "pedestrian", "living_street", "cycleway")) |>
+      osmdata_sf(),
+    error = function(e) NULL)
+  ylit <- tryCatch(
+    q |> add_osm_feature("highway", "crossing") |> osmdata_sf(),
+    error = function(e) NULL)
+  list(polut = polut, ylitykset = ylit)
+}
+
+verkko <- cached("verkko_osm", {
+  esikarsinta |>
+    st_transform(4326) |>
+    st_geometry() |>
+    map(hae_verkko)
+})
+
+verkkomitat <- map2_dfr(verkko, esikarsinta$puskuri_id, function(v, id) {
+  polku_km <- 0
+  if (!is.null(v$polut) && !is.null(v$polut$osm_lines) &&
+      nrow(v$polut$osm_lines) > 0) {
+    polku_km <- v$polut$osm_lines |>
+      st_transform(3067) |>
+      st_length() |>
+      sum() |>
+      as.numeric() / 1000
+  }
+  n_ylitys <- 0
+  if (!is.null(v$ylitykset) && !is.null(v$ylitykset$osm_points)) {
+    n_ylitys <- nrow(v$ylitykset$osm_points)
+  }
+  tibble(puskuri_id = id, polku_km = polku_km, n_ylitys = n_ylitys)
+})
+```
+
+```{r pisteet}
+norm01 <- function(x) {
+  # Talvoitus 5. ja 95. persentiiliin: yksittäinen suurkaupunki ei saa
+  # litistää koko muuta jakaumaa nollaan.
+  lo <- quantile(x, 0.05, na.rm = TRUE)
+  hi <- quantile(x, 0.95, na.rm = TRUE)
+  pmin(pmax((x - lo) / (hi - lo), 0), 1)
+}
+
+pisteet <- esikarsinta |>
+  st_drop_geometry() |>
+  left_join(verkkomitat, by = "puskuri_id") |>
+  mutate(
+    ala_km2       = pi * (params$radius_m / 1000)^2,
+    asukastiheys  = vaesto / ala_km2,
+    polkutiheys   = polku_km / ala_km2,
+    ylitystiheys  = n_ylitys / pmax(polku_km, 1),
+
+    k_kysynta      = norm01(tyoikaiset),
+    k_kuljettavuus = norm01(polkutiheys),
+    k_tiheys       = norm01(asukastiheys),
+    # Ylitykset ovat riski, joten komponentti käännetään
+    k_ylitykset    = 1 - norm01(ylitystiheys),
+
+    pisteet = painot["kysynta"]      * k_kysynta +
+              painot["kuljettavuus"] * k_kuljettavuus +
+              painot["tiheys"]       * k_tiheys +
+              painot["ylitykset"]    * k_ylitykset
+  )
+```
+
+## Validointi
+
+Ainoa tapa tarkistaa tämä ulkopuolelta on katsoa, tunnistaako pisteytys
+jo käytössä olevat sijainnit. Mallia ei ole rakennettu tunnistamaan niitä.
+
+```{r validointi}
+validointi <- pisteet |>
+  mutate(sija = rank(-pisteet))
+
+auc <- with(validointi, {
+  p <- pisteet[palveltu]; n <- pisteet[!palveltu]
+  mean(outer(p, n, ">")) + 0.5 * mean(outer(p, n, "=="))
+})
+
+validointi |>
+  group_by(palveltu) |>
+  summarise(
+    n = n(),
+    mediaanipisteet = round(median(pisteet), 3),
+    mediaanisija    = round(median(sija)),
+    .groups = "drop"
+  ) |>
+  kable(caption = sprintf("Erottelukyky, AUC = %.2f", auc))
+
+# Yksittäinen ankkuri: Siilinjärven keskustan S-market on julkisten
+# tietojen mukaan ollut Suomen aktiivisin robottilähtöpiste.
+validointi |>
+  filter(str_detect(name, "Siilinjärv")) |>
+  select(name, kunta, vaesto, polku_km, pisteet, sija) |>
+  kable(caption = "Siilinjärven sijoitus mallissa")
+```
+
+Jos AUC jää lähelle 0.5, malli ei erottele ja sen komponentit ovat väärät.
+Jos se on selvästi yli 0.7, avoimesta datasta lasketut piirteet selittävät
+nykyisiä sijoituspäätöksiä siinä määrin, että samoilla piirteillä voi
+ehdottaa seuraavia.
+
+## Kärkiehdokkaat
+
+```{r shortlist}
+kärki <- pisteet |>
+  filter(!palveltu) |>
+  arrange(desc(pisteet)) |>
+  slice_head(n = params$n_shortlist) |>
+  transmute(
+    Myymälä = name, Kunta = kunta,
+    `Väestö 3 km` = round(vaesto),
+    `Kevyt väylä km` = round(polku_km),
+    Pisteet = round(pisteet, 3)
+  )
+
+kable(kärki, caption = "Parhaat palvelemattomat myymälät")
+```
+
+```{r rollup}
+# Kaupallinen päätös tehdään alueosuuskaupan kanssa, ei myymälä kerrallaan.
+pisteet |>
+  filter(!palveltu) |>
+  group_by(Kunta = kunta) |>
+  summarise(
+    Myymälöitä = n(),
+    `Yhteisväestö` = round(sum(vaesto)),
+    `Mediaanipisteet` = round(median(pisteet), 3),
+    .groups = "drop"
+  ) |>
+  arrange(desc(Mediaanipisteet)) |>
+  slice_head(n = 15) |>
+  kable(caption = "Kunnittain: montako myymälää samalla neuvottelulla")
+```
+
+```{r kartta}
+#| fig-height: 7
+kunnat <- cached("kunnat", geofi::get_municipalities(year = 2023))
+
+ggplot() +
+  geom_sf(data = kunnat, fill = "grey96", colour = "white", linewidth = 0.1) +
+  geom_sf(data = pisteet |>
+            left_join(select(puskurit, puskuri_id), by = "puskuri_id") |>
+            st_as_sf() |> st_centroid(),
+          aes(colour = pisteet, shape = palveltu), size = 2) +
+  scale_colour_viridis_c(option = "magma", direction = -1) +
+  scale_shape_manual(values = c(`FALSE` = 16, `TRUE` = 4),
+                     labels = c("Ehdokas", "Jo käytössä")) +
+  labs(colour = "Pisteet", shape = NULL) +
+  theme_void()
+```
+
+## Mitä sisäinen data muuttaisi
+
+Kolme kohtaa, joissa avoin data korvautuisi mittauksella ja pisteytys
+todennäköisesti muuttuisi merkittävästi:
+
+**Todellinen toimitusaika korvaisi polkutiheyden.** Kevyen liikenteen
+väylien kilometrimäärä on karkea korvike sille, mitä oikeasti halutaan
+tietää: pääseekö robotti perille ajassa, joka pitää asiakkaan tyytyväisenä.
+Telemetriasta laskettu toteutunut matka-aika verkon rakenteen funktiona
+kalibroisi tämän komponentin suoraan.
+
+**Tilausvolyymi korvaisi väestömäärän.** Työikäinen väestö säteellä on
+kysynnän korvike. Olemassa olevien alueiden tilaustiheys asukasta kohti
+kertoisi, mitkä väestörakenteen piirteet oikeasti ennustavat kysyntää, ja
+kysyntäkomponentin voisi estimoida sen sijaan että se painotetaan käsin.
+
+**Kustannus per toimitus ratkaisisi painotuksen.** Nyt painot on asetettu
+harkinnalla. Yksikkötalouden datalla ne voisi valita niin, että pisteytys
+ennustaa katetta eikä volyymia, jolloin kärkilista muuttuisi
+todennäköisesti tiheiden pikkukaupunkien suuntaan.
+
+Talvi puuttuu tästä versiosta kokonaan. Lumipeitepäivien ja pakkaspäivien
+määrä Ilmatieteen laitoksen avoimesta datasta olisi luonteva viides
+komponentti, ja se on ainoa tekijä, jota kansainvälinen vertailuaineisto
+ei tunne lainkaan.
+
+## Rajoitteet
+
+- Väestö allokoidaan postinumeroalueilta pinta-alapainotetusti, mikä
+  yliarvioi laajojen ja harvaan asuttujen alueiden reunamyymälöitä.
+- OSM:n kattavuus vaihtelee alueittain; kevyen liikenteen väylien
+  digitointi on kaupungeissa parempi kuin taajamissa, mikä suosii
+  kaupunkeja systemaattisesti.
+- Korkeuserot ja pinnan laatu puuttuvat. Ne ratkaisevat robotin
+  kulkukelpoisuuden ja vaatisivat korkeusmallin.
+- Nykyisten alueiden lista on koottu lehdistötiedotteista ja voi olla
+  epätäydellinen, mikä heikentää validointia molempiin suuntiin.
+- Myymälän kapasiteetti keräilyyn on rajoite, jota avoin data ei näe
+  lainkaan.
