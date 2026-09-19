@@ -1,0 +1,280 @@
+rivi_id,myymala,ketju,kunta,maakunta,alueosuuskauppa,aloituspaiva,aloitus_tarkkuus,lopetuspaiva,tila,huomiot,lahde_id
+1,Alepa Otaniemi,Alepa,Espoo,Uusimaa,HOK-Elanto,2022-04-12,päivä,2022-10-31,pilotti (päättynyt),"Suomen ensimmäinen ruoan robottitoimitusmyymälä. Alepan/Starshipin pilotti keväällä 2022 (60 robottia, 6 Alepaa Espoossa, tilaus Starshipin omalla sovelluksella); pilotti päättyi 31.10.2022. Ei mainittu 2023 uudelleenkäynnistyksen nimetyissä myymälöissä.",L03;L04;L05
+2,Alepa Mankkaa,Alepa,Espoo,Uusimaa,HOK-Elanto,2022-04-19,viikko,2022-10-31,pilotti (päättynyt),"Toimitukset alkoivat Otaniemeä seuraavalla viikolla. Alepan/Starshipin pilotti keväällä 2022 (60 robottia, 6 Alepaa Espoossa, tilaus Starshipin omalla sovelluksella); pilotti päättyi 31.10.2022.",L03;L05
+3,Alepa Jousenpuisto,Alepa,Espoo,Uusimaa,HOK-Elanto,2022-04-19,viikko,2022-10-31,pilotti (päättynyt),"Toimitukset alkoivat Otaniemeä seuraavalla viikolla. Alepan/Starshipin pilotti keväällä 2022 (60 robottia, 6 Alepaa Espoossa, tilaus Starshipin omalla sovelluksella); pilotti päättyi 31.10.2022. Ei mainittu 2023 uudelleenkäynnistyksen nimetyissä myymälöissä.",L03;L05
+4,Alepa Laajalahti,Alepa,Espoo,Uusimaa,HOK-Elanto,2022-04-19,viikko,2022-10-31,pilotti (päättynyt),"Toimitukset alkoivat Otaniemeä seuraavalla viikolla. Alepan/Starshipin pilotti keväällä 2022 (60 robottia, 6 Alepaa Espoossa, tilaus Starshipin omalla sovelluksella); pilotti päättyi 31.10.2022.",L03;L05
+5,Alepa Leppävaara,Alepa,Espoo,Uusimaa,HOK-Elanto,2022-04-19,viikko,2022-10-31,pilotti (päättynyt),"Toimitukset alkoivat Otaniemeä seuraavalla viikolla. Alepan/Starshipin pilotti keväällä 2022 (60 robottia, 6 Alepaa Espoossa, tilaus Starshipin omalla sovelluksella); pilotti päättyi 31.10.2022. Ei mainittu 2023 uudelleenkäynnistyksen nimetyissä myymälöissä.",L03;L05
+6,Alepa Matinkylä,Alepa,Espoo,Uusimaa,HOK-Elanto,2022-04-19,viikko,2022-10-31,pilotti (päättynyt),"Toimitukset alkoivat Otaniemeä seuraavalla viikolla. Alepan/Starshipin pilotti keväällä 2022 (60 robottia, 6 Alepaa Espoossa, tilaus Starshipin omalla sovelluksella); pilotti päättyi 31.10.2022.",L03;L05
+7,Alepa Laajalahti,Alepa,Espoo,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+8,Alepa Mankkaa,Alepa,Espoo,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+9,Alepa Matinkylä,Alepa,Espoo,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+10,Alepa Kilo,Alepa,Espoo,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+11,Alepa Keilaniemi,Alepa,Espoo,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+12,Alepa Pajamäki,Alepa,Helsinki,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+13,Alepa Etelä-Haaga,Alepa,Helsinki,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+14,Alepa Pasilanraitio,Alepa,Helsinki,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+15,Alepa Jupperi,Alepa,Espoo,Uusimaa,HOK-Elanto,2023-05-02,viikko,,aktiivinen,"Vakinainen palvelu S-kaupat-sovelluksessa alkoi viikolla 18/2023 (tiedote 2.5.2023: 'tällä viikolla' kolme Alepaa Espoossa, ensimmäisten päivien aikana yhdeksän myymälää). Palvelu laajeni 'pariinkymmeneen' Alepaan alkukesällä 2023, muita myymälöitä ei nimetty.",L02;L01;L10
+16,Alepa-myymälät Vantaalla (nimeämättömät),Alepa,Vantaa,Uusimaa,HOK-Elanto,2023-06,arvio,,aktiivinen,"HOK-Elanto: robokuljetukset laajenivat Vantaalle alkukesällä 2023; tiedote ei nimennyt Vantaan myymälöitä. Rivi merkitsee Vantaan aloitusvuotta, ei yksittäistä myymälää.",L02;L06
+17,Alepa Kuparitalo,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa.",L09
+18,Alepa Sturenkatu 40,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa.",L09
+19,Alepa Jollas,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa.",L09
+20,Alepa Vuosaari,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa.",L09
+21,Alepa Kannelmäki,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa.",L09
+22,Alepa Pikku Huopalahti,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa.",L09
+23,Alepa Ruoholahdenkatu,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa.",L09
+24,Alepa Porttipuisto,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa. Tiedote listaa myymälän Helsingin alle; Porttipuisto-niminen alue sijaitsee Vantaalla (Kehä III) – kunta varmistettava.",L09
+25,Alepa Karakallio,Alepa,Espoo,Uusimaa,HOK-Elanto,2026-05,arvio,,aktiivinen,"HOK-Elannon tiedote 19.5.2026 listaa myymälän kohtaan 'myymälät, joihin robokuljetukset on jo avattu' (kevät 2026). Tarkka avauspäivä ei tiedossa.",L09
+26,Alepa Siltamäki,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-06,kuukausi,,aktiivinen,HOK-Elannon tiedote 19.5.2026: robokuljetukset avataan touko–kesäkuussa 2026.,L09
+27,Alepa Mechelininkatu,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-06,kuukausi,,aktiivinen,HOK-Elannon tiedote 19.5.2026: robokuljetukset avataan touko–kesäkuussa 2026.,L09
+28,Alepa Viiskulma,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-06,kuukausi,,aktiivinen,HOK-Elannon tiedote 19.5.2026: robokuljetukset avataan touko–kesäkuussa 2026.,L09
+29,Alepa Kruununhaka,Alepa,Helsinki,Uusimaa,HOK-Elanto,2026-06,kuukausi,,aktiivinen,HOK-Elannon tiedote 19.5.2026: robokuljetukset avataan touko–kesäkuussa 2026.,L09
+30,Alepa Ilola,Alepa,Vantaa,Uusimaa,HOK-Elanto,2026-06,kuukausi,,aktiivinen,HOK-Elannon tiedote 19.5.2026: robokuljetukset avataan touko–kesäkuussa 2026.,L09
+31,Alepa Pellonkulma,Alepa,Järvenpää,Uusimaa,HOK-Elanto,2026-06,kuukausi,,aktiivinen,HOK-Elannon tiedote 19.5.2026: robokuljetukset avataan touko–kesäkuussa 2026.,L09
+32,Alepa Lahela,Alepa,Tuusula,Uusimaa,HOK-Elanto,2026-06,kuukausi,,aktiivinen,HOK-Elannon tiedote 19.5.2026: robokuljetukset avataan touko–kesäkuussa 2026.,L09
+33,Sale Amuri,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2023-06-13,päivä,,aktiivinen,Tampereen ensimmäiset robomyymälät.,L11;L12
+34,Sale Hervanta,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2023-06-13,päivä,,aktiivinen,Tampereen ensimmäiset robomyymälät.,L11;L12
+35,Sale Hatanpää,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2023-06-13,päivä,,aktiivinen,Tampereen ensimmäiset robomyymälät.,L11;L12
+36,Sale Härmälänranta,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2023-06-13,päivä,,aktiivinen,Tampereen ensimmäiset robomyymälät.,L11;L12
+37,Sale Vuores,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2023-06-13,päivä,,aktiivinen,Tampereen ensimmäiset robomyymälät.,L11;L12
+38,Sale Tampella,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2023-06-13,päivä,,epäselvä,"Mukana 13.6.2023 aloituksessa, mutta ei enää POK:n robomyymälälistalla 6/2024 eikä 10/2024 (rajatapaus; lopetus/siirto ei tiedotettu).",L11;L12;L74
+39,Sale Osmonmäki,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2023,arvio,,aktiivinen,Tiedote 13.6.2023: robokuljetukset alkavat myymälän remontin valmistuttua; mukana kuuden Salen listalla 6/2024.,L11;L12
+40,Sale Janka,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-06-04,päivä,,aktiivinen,,L12
+41,Sale Suuppa,Sale,Pirkkala,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-06-04,päivä,,aktiivinen,,L12
+42,S-market Myllyhaka,S-market,Nokia,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-06-04,päivä,,aktiivinen,Ensimmäiset S-marketit Pirkanmaalla.,L12
+43,S-market Kangasala,S-market,Kangasala,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-06-04,päivä,,aktiivinen,Ensimmäiset S-marketit Pirkanmaalla.,L12
+44,S-market Kaukajärvi,S-market,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-10-21,päivä,,aktiivinen,,L13;L74
+45,S-market Tesoma,S-market,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-10-21,päivä,,aktiivinen,,L13;L74
+46,S-market Superi,S-market,Valkeakoski,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-10-22,päivä,,aktiivinen,,L13;L74
+47,S-market Toijala,S-market,Akaa,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-10-22,päivä,,aktiivinen,POK:n mukaan yksi aktiivisimmista robomyymälöistä.,L13;L14;L74
+48,Sale Leinola,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2024-10-23,päivä,,aktiivinen,,L13;L74
+49,S-market Niemenranta,S-market,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2025-05-06,päivä,,aktiivinen,,L14
+50,S-market Lempäälä,S-market,Lempäälä,Pirkanmaa,Pirkanmaan Osuuskauppa,2025-05-06,päivä,,aktiivinen,,L14
+51,Sale Metsäkylä,Sale,Ylöjärvi,Pirkanmaa,Pirkanmaan Osuuskauppa,2025-05-06,päivä,,aktiivinen,,L14
+52,Sale Hallila,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-03-11,päivä,,aktiivinen,Ensimmäistä kertaa uusia alueita avattiin talvella.,L15
+53,Sale Sorva,Sale,Nokia,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-03-11,päivä,,aktiivinen,,L15
+54,S-market Sääksjärvi,S-market,Lempäälä,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-03-11,päivä,,aktiivinen,,L15
+55,S-market Hyhky,S-market,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-03-17,päivä,,aktiivinen,,L15
+56,Sale Annala,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-03-25,päivä,,aktiivinen,,L15
+57,Sale Asemantie,Sale,Ylöjärvi,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-03-25,päivä,,aktiivinen,"Kunta tarkistettu: Asemantie 2, Ylöjärvi.",L15;L80
+58,Sale Hippos,Sale,Tampere,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-03-25,päivä,,aktiivinen,Kalevaan kesällä 2025 avattu uusi Sale.,L15;L14
+59,Sale Nattari,Sale,Kangasala,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-03-25,päivä,,aktiivinen,Kunta tarkistettu (Kangasala).,L15;L80
+60,Sale Kaurasmäki,Sale,Ylöjärvi,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-04-28,päivä,,aktiivinen,"Kunta tarkistettu: Kauraslaaksontie 2, Ylöjärvi.",L15;L80
+61,S-market Virrat,S-market,Virrat,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-05-06,päivä,,aktiivinen,,L15
+62,S-market Viiala,S-market,Akaa,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-05-06,päivä,,aktiivinen,,L15
+63,S-market Tippavaara,S-market,Hämeenkyrö,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-05-06,päivä,,aktiivinen,"Kunta tarkistettu: Kyreltie 1, Kyröskoski, Hämeenkyrö.",L15;L80
+64,S-market Mänttä,S-market,Mänttä-Vilppula,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-05-06,päivä,,aktiivinen,,L15
+65,S-market Orivesi,S-market,Orivesi,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-05-06,päivä,,aktiivinen,,L15
+66,Sale Hakkari,Sale,Lempäälä,Pirkanmaa,Pirkanmaan Osuuskauppa,2026-05-13,päivä,,aktiivinen,Uudelleenrakennettu Sale (vanha myymälä purettu 4/2025).,L15
+67,Sale Hämeenkatu,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2023-06-15,viikko,,aktiivinen,"Tiedote 15.6.2023 ei nimennyt myymälöitä ('Turun keskustan Sale-myymälöistä'; alueet keskusta, Linnafältti, Martti, yliopistonmäki, Nummi). Nimi päätelty TOK:n robomyymälälistasta ja laajennustiedotteista; aloitusviikko 24/2023.",L16;L22
+68,Sale Kompassi,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2023-06-15,viikko,,aktiivinen,"Tiedote 15.6.2023 ei nimennyt myymälöitä ('Turun keskustan Sale-myymälöistä'; alueet keskusta, Linnafältti, Martti, yliopistonmäki, Nummi). Nimi päätelty TOK:n robomyymälälistasta ja laajennustiedotteista; aloitusviikko 24/2023.",L16;L22
+69,Sale Käsityöläiskatu,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2023-06-15,viikko,,aktiivinen,"Tiedote 15.6.2023 ei nimennyt myymälöitä ('Turun keskustan Sale-myymälöistä'; alueet keskusta, Linnafältti, Martti, yliopistonmäki, Nummi). Nimi päätelty TOK:n robomyymälälistasta ja laajennustiedotteista; aloitusviikko 24/2023.",L16;L22
+70,Sale Martti,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2023-06-15,viikko,,aktiivinen,"Tiedote 15.6.2023 ei nimennyt myymälöitä ('Turun keskustan Sale-myymälöistä'; alueet keskusta, Linnafältti, Martti, yliopistonmäki, Nummi). Nimi päätelty TOK:n robomyymälälistasta ja laajennustiedotteista; aloitusviikko 24/2023.",L16;L22
+71,S-market Lieto,S-market,Lieto,Varsinais-Suomi,Turun Osuuskauppa (TOK),2023-12-18,päivä,,aktiivinen,TOK:n ensimmäinen robomyymälä Turun ulkopuolella.,L17;L79
+72,Sale Etappi,Sale,Naantali,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-05-27,viikko,,aktiivinen,Tiedote 27.5.2024: 'tällä viikolla'.,L18
+73,S-market Naantali (Tuulensuunkatu),S-market,Naantali,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-05-27,viikko,,aktiivinen,Tiedote 27.5.2024: 'tällä viikolla'.,L18
+74,S-market Vakka-Suomenkatu (Uusikaupunki),S-market,Uusikaupunki,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-05-27,viikko,,aktiivinen,Tiedote 27.5.2024: 'tällä viikolla'.,L18
+75,S-market Kaarina,S-market,Kaarina,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-05-27,viikko,,aktiivinen,Tiedote 27.5.2024: 'tällä viikolla'.,L18
+76,S-market Parainen,S-market,Parainen,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-05-27,viikko,,aktiivinen,Tiedote 27.5.2024: 'tällä viikolla'.,L18
+77,S-market Piikkiö,S-market,Kaarina,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-05-27,viikko,,aktiivinen,Tiedote 27.5.2024: 'tällä viikolla'.,L18
+78,Sale Lauste,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-06,kuukausi,,aktiivinen,Tiedote 27.5.2024: käyttöön kesäkuun 2024 puoliväliin mennessä.,L18
+79,Sale Petrelius,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-06,kuukausi,,aktiivinen,Tiedote 27.5.2024: käyttöön kesäkuun 2024 puoliväliin mennessä.,L18
+80,Sale Jyrkkälä,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-06,kuukausi,,aktiivinen,Tiedote 27.5.2024: käyttöön kesäkuun 2024 puoliväliin mennessä.,L18
+81,Sale Runosmäki,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-06,kuukausi,,aktiivinen,Tiedote 27.5.2024: käyttöön kesäkuun 2024 puoliväliin mennessä.,L18
+82,S-market Raisiontori,S-market,Raisio,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-06,kuukausi,,aktiivinen,Tiedote 27.5.2024: käyttöön kesäkuun 2024 puoliväliin mennessä.,L18
+83,S-market Auranlaakso,S-market,Kaarina,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-06,kuukausi,,aktiivinen,Tiedote 27.5.2024: käyttöön kesäkuun 2024 puoliväliin mennessä.,L18
+84,S-market Rusko,S-market,Rusko,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-06,kuukausi,,aktiivinen,Tiedote 27.5.2024: käyttöön kesäkuun 2024 puoliväliin mennessä.,L18
+85,S-market Halinen,S-market,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2024-06,kuukausi,,aktiivinen,Tiedote 27.5.2024: käyttöön kesäkuun 2024 puoliväliin mennessä.,L18
+86,S-market Aura,S-market,Aura,Varsinais-Suomi,Turun Osuuskauppa (TOK),2025-05-21,päivä,,aktiivinen,,L19
+87,Sale Jäkärlä,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2025-08,kuukausi,,aktiivinen,TOK:n tiedote 27.8.2025 'Ruoan kuljetusrobotit saapuvat Jäkärlään'; tarkka päivä ei tarkistettu.,L20;L22
+88,S-market Moisio,S-market,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2025,arvio,,aktiivinen,"Ei nimetty 2024 laajennuksissa eikä 2026 laajennuksissa, mutta mukana TOK:n 40 myymälän listalla → aloitus välillä 7/2024–3/2026 (todennäköisimmin 2025). Tiedotetta ei löydetty.",L22
+89,S-market Mynämäki,S-market,Mynämäki,Varsinais-Suomi,Turun Osuuskauppa (TOK),2025,arvio,,aktiivinen,"Ei nimetty 2024 laajennuksissa eikä 2026 laajennuksissa, mutta mukana TOK:n 40 myymälän listalla → aloitus välillä 7/2024–3/2026 (todennäköisimmin 2025). Tiedotetta ei löydetty.",L22
+90,S-market Paimio,S-market,Paimio,Varsinais-Suomi,Turun Osuuskauppa (TOK),2025,arvio,,aktiivinen,"Ei nimetty 2024 laajennuksissa eikä 2026 laajennuksissa, mutta mukana TOK:n 40 myymälän listalla → aloitus välillä 7/2024–3/2026 (todennäköisimmin 2025). Tiedotetta ei löydetty.",L22
+91,Sale Verkahovi,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-04,kuukausi,,aktiivinen,Tiedote 8.6.2026: laajentaminen aloitettiin huhtikuussa 2026.,L21;L22
+92,Sale Laivurinkatu,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-04,kuukausi,,aktiivinen,Tiedote 8.6.2026: laajentaminen aloitettiin huhtikuussa 2026.,L21;L22
+93,Sale Koulukatu (Uusikaupunki),Sale,Uusikaupunki,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-04,kuukausi,,aktiivinen,Tiedote 8.6.2026: laajentaminen aloitettiin huhtikuussa 2026.,L21;L22
+94,S-market Pansio,S-market,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-04,kuukausi,,aktiivinen,Tiedote 8.6.2026: laajentaminen aloitettiin huhtikuussa 2026.,L21;L22
+95,Sale Tennby,Sale,Parainen,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-05,kuukausi,,aktiivinen,Tiedote 8.6.2026: käyttöön toukokuussa 2026.,L21;L22
+96,Sale Merimasku,Sale,Naantali,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-05,kuukausi,,aktiivinen,Tiedote 8.6.2026: käyttöön toukokuussa 2026.,L21;L22
+97,Sale Paattinen,Sale,Turku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-09,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+98,S-market Sauvo,S-market,Sauvo,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-09,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+99,Sale Kyrö,Sale,Pöytyä,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-10,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+100,Sale Pöytyä,Sale,Pöytyä,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-10,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+101,S-market Vehmaa,S-market,Vehmaa,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-11,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+102,Sale Lemu,Sale,Masku,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-11,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+103,S-market Nousiainen,S-market,Nousiainen,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-16,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+104,Sale Alastaro,Sale,Loimaa,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-16,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+105,Sale Yläne,Sale,Pöytyä,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-16,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+106,Sale Nauvo,Sale,Parainen,Varsinais-Suomi,Turun Osuuskauppa (TOK),2026-06-17,päivä,,aktiivinen,Robolaajennusten aikataulu kesäkuu 2026 (TOK). Näiden jälkeen 40 myymälää ja lähes 150 robottia TOK:n alueella.,L21;L22
+107,Sale Tori,Sale,Pori,Satakunta,Satakunnan Osuuskauppa,2023-06-20,päivä,,aktiivinen,"Porin keskusta, kauppatorin vieressä.",L23
+108,Sale Paratiisinmäki,Sale,Pori,Satakunta,Satakunnan Osuuskauppa,2024-06-04,päivä,,aktiivinen,,L24
+109,S-market Noormarkku,S-market,Pori,Satakunta,Satakunnan Osuuskauppa,2024-06-04,päivä,,aktiivinen,,L24
+110,S-market Lukkarinsanta,S-market,Pori,Satakunta,Satakunnan Osuuskauppa,2024-11,kuukausi,,aktiivinen,Tiedote 18.11.2024 (osuuskaupan neljäs robotoimipaikka).,L25
+111,Sale Opistonkatu,Sale,Kankaanpää,Satakunta,Satakunnan Osuuskauppa,2025-04,kuukausi,,aktiivinen,Kolme robottia; tiedote 17.4.2025 'aloittivat huhtikuussa'.,L26
+112,Sale Lahdenkatu,Sale,Rauma,Satakunta,Osuuskauppa Keula,2023-09-07,päivä,,aktiivinen,"Alkuperäinen aloitus oli 19.6.2023, siirtyi Starshipin kartoitussyistä 7.9.2023.",L27;L71;L72
+113,Sale Syväraumankatu,Sale,Rauma,Satakunta,Osuuskauppa Keula,2023-09-07,päivä,,aktiivinen,"Alkuperäinen aloitus oli 19.6.2023, siirtyi Starshipin kartoitussyistä 7.9.2023.",L27;L71;L72
+114,Sale Kalliokatu,Sale,Rauma,Satakunta,Osuuskauppa Keula,2024-05,kuukausi,,aktiivinen,Tiedote 13.5.2024: laajennus toukokuun 2024 aikana.,L28
+115,Sale Monnankatu,Sale,Rauma,Satakunta,Osuuskauppa Keula,2024-05,kuukausi,,aktiivinen,Tiedote 13.5.2024: laajennus toukokuun 2024 aikana.,L28
+116,Sale Kauttua,Sale,Eura,Satakunta,Osuuskauppa Keula,2024-05,kuukausi,,aktiivinen,Tiedote 13.5.2024: laajennus toukokuun 2024 aikana.,L28
+117,Sale Laitila,Sale,Laitila,Varsinais-Suomi,Osuuskauppa Keula,2024-05,kuukausi,,aktiivinen,Tiedote 13.5.2024: laajennus toukokuun 2024 aikana.,L28
+118,S-market Savela,S-market,Jyväskylä,Keski-Suomi,Osuuskauppa Keskimaa,2023-06-20,päivä,,aktiivinen,Keskimaan robotit S-marketeista alusta asti (muissa osuuskaupoissa aluksi Sale/Alepa).,L29;L77
+119,S-market Tourula,S-market,Jyväskylä,Keski-Suomi,Osuuskauppa Keskimaa,2023-06-20,päivä,2025-05-07,lopetettu,Robotit siirrettiin S-market Kuokkalaan 7.5.2025; Tourulan alueella pikatoimitukset jatkuvat Woltin kautta Mestarin Herkusta.,L29;L30;L73
+120,S-market Kuokkala,S-market,Jyväskylä,Keski-Suomi,Osuuskauppa Keskimaa,2025-05-07,päivä,,aktiivinen,Korvasi S-market Tourulan robomyymälänä.,L30;L73
+121,"S-market Herkku (Sokos Herkku, Valkea)",S-market / Sokos Herkku,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2023-09-11,päivä,,aktiivinen,"Oulun ydinkeskusta. Aloitus viivästyi kesä-heinäkuusta, koska robotteja ei riittänyt pohjoiseen.",L31;L32
+122,S-market Ritaharju,S-market,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2024-06,kuukausi,,aktiivinen,"Kartoitusajot toukokuun lopussa 2024, tilaukset kesäkuun puoliväliin mennessä.",L32;L78
+123,Sale Linnakangas,Sale,Kempele,Pohjois-Pohjanmaa,Osuuskauppa Arina,2024-06,kuukausi,,aktiivinen,"Kartoitusajot toukokuun lopussa 2024, tilaukset kesäkuun puoliväliin mennessä.",L32;L78
+124,S-market Haukipudas,S-market,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2025-05,kuukausi,,aktiivinen,,L33
+125,S-market Oulunsalo,S-market,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2025-05,kuukausi,,aktiivinen,,L33
+126,Sale Lapinmaa,Sale,Rovaniemi,Lappi,Osuuskauppa Arina,2025-08-26,päivä,,aktiivinen,'Maailman pohjoisimmat robottikuljetukset'.,L34
+127,S-market Talvitie,S-market,Rovaniemi,Lappi,Osuuskauppa Arina,2025-08-26,päivä,,aktiivinen,'Maailman pohjoisimmat robottikuljetukset'.,L34
+128,S-market Jääli,S-market,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-03,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyivät maaliskuussa 2026.,L35
+129,S-market Liminka,S-market,Liminka,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-03,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyivät maaliskuussa 2026.,L35
+130,S-market Pattijoki,S-market,Raahe,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-03,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyivät maaliskuussa 2026.,L35
+131,S-market Muhos,S-market,Muhos,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-05,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät toukokuussa 2026.,L35
+132,S-market Kaakkuri,S-market,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-05,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät toukokuussa 2026.,L35
+133,S-market Kiiminki,S-market,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-05,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät toukokuussa 2026.,L35
+134,S-market Saarenkylä,S-market,Rovaniemi,Lappi,Osuuskauppa Arina,2026-05,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät toukokuussa 2026.,L35
+135,S-market Hiukkavaara,S-market,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-05,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät toukokuussa 2026.,L35
+136,S-market Kastelli,S-market,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-06,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät kesäkuussa 2026.,L35
+137,Sale Hintta,Sale,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-06,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät kesäkuussa 2026.,L35
+138,Sale Myllyoja,Sale,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-06,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät kesäkuussa 2026.,L35
+139,Sale Höyhtyä,Sale,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-06,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät kesäkuussa 2026.,L35
+140,Sale Maikkula,Sale,Oulu,Pohjois-Pohjanmaa,Osuuskauppa Arina,2026-06,kuukausi,,aktiivinen,Tiedote 12.5.2026: käynnistyvät kesäkuussa 2026.,L35
+141,S-market Maljalahti,S-market,Kuopio,Pohjois-Savo,Osuuskauppa PeeÄssä,2024-05,kuukausi,,aktiivinen,Itä-Suomen ensimmäiset robotit (PeeÄssä: 'toukokuussa 2024'; ennakkotiedote 22.4.2024 'alkukesästä').,L36;L37;L38
+142,S-market Keilankanta,S-market,Kuopio,Pohjois-Savo,Osuuskauppa PeeÄssä,2024-05,kuukausi,,aktiivinen,Itä-Suomen ensimmäiset robotit (PeeÄssä: 'toukokuussa 2024'; ennakkotiedote 22.4.2024 'alkukesästä').,L36;L37;L38
+143,S-market Vuorela,S-market,Siilinjärvi,Pohjois-Savo,Osuuskauppa PeeÄssä,2024-05,kuukausi,,aktiivinen,Itä-Suomen ensimmäiset robotit (PeeÄssä: 'toukokuussa 2024'; ennakkotiedote 22.4.2024 'alkukesästä').,L36;L37;L38
+144,S-market Puijonlaakso,S-market,Kuopio,Pohjois-Savo,Osuuskauppa PeeÄssä,2024-11-11,viikko,,aktiivinen,Viikko 46/2024. Robotteihin kohdistui ilkivaltaa Puijonlaaksossa (Yle 1/2025).,L37;L08
+145,S-market Petonen,S-market,Kuopio,Pohjois-Savo,Osuuskauppa PeeÄssä,2024-11-11,viikko,,aktiivinen,Viikko 46/2024.,L37
+146,S-market Ykkösrasti,S-market,Kuopio,Pohjois-Savo,Osuuskauppa PeeÄssä,2025-04,kuukausi,,aktiivinen,,L38;L39
+147,S-market Iisalmi,S-market,Iisalmi,Pohjois-Savo,Osuuskauppa PeeÄssä,2025-06-09,päivä,,aktiivinen,,L38
+148,S-market Kommila,S-market,Varkaus,Pohjois-Savo,Osuuskauppa PeeÄssä,2025-06-09,päivä,,aktiivinen,,L38
+149,S-market Siilinjärvi,S-market,Siilinjärvi,Pohjois-Savo,Osuuskauppa PeeÄssä,2025-06-09,päivä,,aktiivinen,,L38
+150,Sale Päiväranta,Sale,Kuopio,Pohjois-Savo,Osuuskauppa PeeÄssä,2025-06-09,päivä,,aktiivinen,Sale Päiväranta oli PeeÄssän ensimmäinen pienmyymälä robokuljetuksissa.,L38
+151,S-market Raatikeskus,S-market,Kajaani,Kainuu,Osuuskauppa Maakunta,2025-06-02,päivä,,aktiivinen,Neljä robottia; laajennus asiakkaiden reaktiosta riippuen.,L40
+152,Sale Hiidensalmi,Sale,Lohja,Uusimaa,Suur-Seudun Osuuskauppa (SSO),2023-12-18,päivä,,aktiivinen,SSO:n ensimmäinen robomyymälä (kahdeksas osuuskauppa).,L41
+153,S-market Karkkila,S-market,Karkkila,Uusimaa,Suur-Seudun Osuuskauppa (SSO),2024-04-30,päivä,,aktiivinen,,L42
+154,S-market Somero,S-market,Somero,Varsinais-Suomi,Suur-Seudun Osuuskauppa (SSO),2024-04-30,päivä,,aktiivinen,,L42
+155,S-market Tupuri,S-market,Salo,Varsinais-Suomi,Suur-Seudun Osuuskauppa (SSO),2024-04-30,päivä,,aktiivinen,,L42
+156,Sale Hermanni,Sale,Salo,Varsinais-Suomi,Suur-Seudun Osuuskauppa (SSO),2024-04-30,päivä,,aktiivinen,,L42
+157,Sale Perttilä,Sale,Lohja,Uusimaa,Suur-Seudun Osuuskauppa (SSO),2024-04-30,päivä,,aktiivinen,,L42
+158,S-market Tynninharju,S-market,Lohja,Uusimaa,Suur-Seudun Osuuskauppa (SSO),2024-04-30,päivä,,aktiivinen,,L42
+159,Sale Nummela,Sale,Vihti,Uusimaa,Suur-Seudun Osuuskauppa (SSO),2025,arvio,,aktiivinen,"Mukana SSO:n yhdeksän robomyymälän listalla 6/2026, ei mainittu 4/2024 laajennuksessa → aloitus 5/2024–5/2026. Erillistä tiedotetta ei löydetty.",L43
+160,Sale Paukkula,Sale,Salo,Varsinais-Suomi,Suur-Seudun Osuuskauppa (SSO),2026-06-09,päivä,,aktiivinen,Kunta tarkistettu (Salon Paukkulan kaupunginosa).,L43;L81
+161,Sale Grani,Sale,Kauniainen,Uusimaa,Osuuskauppa Varuboden-Osla,2024-06,kuukausi,,aktiivinen,VBO:n ensimmäiset robotit 'kesäkuun alussa' 2024.,L44;L45
+162,Sale Kantvik,Sale,Kirkkonummi,Uusimaa,Osuuskauppa Varuboden-Osla,2024-11-04,viikko,,aktiivinen,Viikko 45/2024.,L44
+163,Sale Huhtinen,Sale,Porvoo,Uusimaa,Osuuskauppa Varuboden-Osla,2024-11-11,viikko,,aktiivinen,Viikko 46/2024.,L44
+164,S-market Kevätkumpu,S-market,Porvoo,Uusimaa,Osuuskauppa Varuboden-Osla,2024-11-18,viikko,,aktiivinen,Viikko 47/2024.,L44
+165,S-market Hanko,S-market,Hanko,Uusimaa,Osuuskauppa Varuboden-Osla,2025-03-24,viikko,,aktiivinen,Viikko 13/2025.,L45
+166,S-market Masala,S-market,Kirkkonummi,Uusimaa,Osuuskauppa Varuboden-Osla,2025-03-31,viikko,,aktiivinen,Viikko 14/2025.,L45
+167,Sale Lindal,Sale,Kirkkonummi,Uusimaa,Osuuskauppa Varuboden-Osla,2025-03-31,viikko,,aktiivinen,Viikko 14/2025.,L45
+168,S-market Tammisaari,S-market,Raasepori,Uusimaa,Osuuskauppa Varuboden-Osla,2025-04-21,viikko,,aktiivinen,"Viikko 17/2025 (pääsiäisen jälkeen); myymälän nimeä ei mainittu tiedotteessa, Tammisaaressa on yksi S-market.",L45
+169,S-market Siuntio,S-market,Siuntio,Uusimaa,Osuuskauppa Varuboden-Osla,2025-05-05,viikko,,aktiivinen,Viikko 19/2025.,L45
+170,S-market Loviisa,S-market,Loviisa,Uusimaa,Osuuskauppa Varuboden-Osla,2025-05-12,viikko,,aktiivinen,Viikko 20/2025.,L45
+171,S-market Karjaa,S-market,Raasepori,Uusimaa,Osuuskauppa Varuboden-Osla,2025-09-08,viikko,,aktiivinen,Viikko 37/2025.,L46
+172,S-market Veikkola,S-market,Kirkkonummi,Uusimaa,Osuuskauppa Varuboden-Osla,2025-10,kuukausi,,aktiivinen,Lokakuu 2025 (ennen Söderkullaa).,L46;L47
+173,S-market Söderkulla,S-market,Sipoo,Uusimaa,Osuuskauppa Varuboden-Osla,2025-10-21,päivä,,aktiivinen,VBO:n 13. robomyymälä.,L47
+174,S-market Nikkilä,S-market,Sipoo,Uusimaa,Osuuskauppa Varuboden-Osla,2026-04-13,viikko,,aktiivinen,Viikko 16/2026.,L48
+175,Sale Pornainen,Sale,Pornainen,Uusimaa,Osuuskauppa Varuboden-Osla,2026-05-11,viikko,,aktiivinen,Viikko 20/2026.,L49
+176,Sale Askola,Sale,Askola,Uusimaa,Osuuskauppa Varuboden-Osla,2026-05-18,viikko,,aktiivinen,Viikko 21/2026.,L49
+177,S-market Inkoo,S-market,Inkoo,Uusimaa,Osuuskauppa Varuboden-Osla,2026-05-25,viikko,,aktiivinen,Viikko 22/2026. Tämän jälkeen robokuljetus yli puolessa VBO:n ruokakaupoista.,L49
+178,S-market Hirsimäki,S-market,Riihimäki,Kanta-Häme,Osuuskauppa Hämeenmaa,2025-05-14,päivä,,aktiivinen,,L50
+179,S-market Jukola,S-market,Hämeenlinna,Kanta-Häme,Osuuskauppa Hämeenmaa,2025-05-14,päivä,,aktiivinen,,L50
+180,S-market Forssa,S-market,Forssa,Kanta-Häme,Osuuskauppa Hämeenmaa,2025-05-14,päivä,,aktiivinen,,L50
+181,S-market Ankkuri,S-market,Lahti,Päijät-Häme,Osuuskauppa Hämeenmaa,2025-05-15,päivä,,aktiivinen,,L50
+182,S-market Heinoska,S-market,Heinola,Päijät-Häme,Osuuskauppa Hämeenmaa,2025-05-15,päivä,,aktiivinen,,L50
+183,S-market Ahtiala,S-market,Lahti,Päijät-Häme,Osuuskauppa Hämeenmaa,2025-12-17,päivä,,aktiivinen,,L51
+184,S-market Vääksy,S-market,Asikkala,Päijät-Häme,Osuuskauppa Hämeenmaa,2026-06,kuukausi,,aktiivinen,Tiedote 3.6.2026: aloittavat kesäkuussa 2026.,L52;L53
+185,S-market Parola,S-market,Hattula,Kanta-Häme,Osuuskauppa Hämeenmaa,2026-06,kuukausi,,aktiivinen,Tiedote 3.6.2026: aloittavat kesäkuussa 2026.,L52;L53
+186,S-market Tervakoski,S-market,Janakkala,Kanta-Häme,Osuuskauppa Hämeenmaa,2026-06,kuukausi,,aktiivinen,Tiedote 3.6.2026: aloittavat kesäkuussa 2026.,L52;L53
+187,Sale Ersta,Sale,Lahti,Päijät-Häme,Osuuskauppa Hämeenmaa,2026-08-11,päivä,,aktiivinen,,L53
+188,S-market Kiveriö,S-market,Lahti,Päijät-Häme,Osuuskauppa Hämeenmaa,2026-08-11,päivä,,aktiivinen,,L53
+189,S-market Tammela,S-market,Tammela,Kanta-Häme,Osuuskauppa Hämeenmaa,2026-08-11,päivä,,aktiivinen,,L53
+190,S-market Iittala,S-market,Hämeenlinna,Kanta-Häme,Osuuskauppa Hämeenmaa,2026-08-18,päivä,,aktiivinen,,L53
+191,S-market Jalkaranta,S-market,Lahti,Päijät-Häme,Osuuskauppa Hämeenmaa,2026-09-08,päivä,,aktiivinen,,L53
+192,Sale Hirssaari,Sale,Kotka,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2024-05-28,päivä,,aktiivinen,,L54;L55
+193,Sale Eskolanmäki (13.5.2025 alkaen S-market Eskolanmäki),Sale → S-market,Kouvola,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2024-05-28,päivä,,aktiivinen,Myymälä muuttui S-marketiksi 13.5.2025; robokuljetus jatkui.,L54;L56
+194,S-market Koria,S-market,Kouvola,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2024-09-11,päivä,,aktiivinen,,L55
+195,S-market Karhula,S-market,Kotka,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2024-09-11,päivä,,aktiivinen,,L55
+196,S-market Hamina,S-market,Hamina,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2025-05-27,päivä,,aktiivinen,,L56
+197,S-market Karhuvuori,S-market,Kotka,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2025-05-27,päivä,,aktiivinen,,L56
+198,S-market Lehtomäki,S-market,Kouvola,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2025-05-27,päivä,,aktiivinen,,L56
+199,S-market Myllykoski,S-market,Kouvola,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2025-05-27,päivä,,aktiivinen,,L56
+200,Sale Pyhtää,Sale,Pyhtää,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2025-06-04,päivä,,aktiivinen,,L56
+201,S-market Kuusaankeskus,S-market,Kouvola,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2025-06-04,päivä,,aktiivinen,,L56
+202,S-market Valkeala,S-market,Kouvola,Kymenlaakso,Kymen Seudun Osuuskauppa (KSO),2025-06-04,päivä,,aktiivinen,,L56
+203,S-market Sammonlahti,S-market,Lappeenranta,Etelä-Karjala,Etelä-Karjalan Osuuskauppa (Eekoo),2024-05-24,viikko,,aktiivinen,"Etelä-Karjalan ensimmäiset robotit; tutustumistarjous 24.5.–22.6.2024, esittely medialle 24.5.2024.",L57;L75
+204,S-market Pallo,S-market,Lappeenranta,Etelä-Karjala,Etelä-Karjalan Osuuskauppa (Eekoo),2024-11,kuukausi,,aktiivinen,Marraskuun kolmannesta viikosta 2024 alkaen.,L58;L76
+205,S-market Joutseno,S-market,Lappeenranta,Etelä-Karjala,Etelä-Karjalan Osuuskauppa (Eekoo),2024-11,kuukausi,,aktiivinen,Marraskuun kolmannesta viikosta 2024 alkaen.,L58;L76
+206,S-market Vuoksenniska,S-market,Imatra,Etelä-Karjala,Etelä-Karjalan Osuuskauppa (Eekoo),2024-11,kuukausi,,aktiivinen,Marraskuun kolmannesta viikosta 2024 alkaen.,L58;L76
+207,S-market Kourula,S-market,Lappeenranta,Etelä-Karjala,Etelä-Karjalan Osuuskauppa (Eekoo),2026-06-29,päivä,,aktiivinen,,L59
+208,S-market Imatrankoski,S-market,Imatra,Etelä-Karjala,Etelä-Karjalan Osuuskauppa (Eekoo),2026,arvio,,aktiivinen,Mainittu 26.6.2026 tiedotteessa jo toimivana robomyymälänä; ei mukana 11/2024 laajennuksessa → aloitus 12/2024–6/2026. Erillistä tiedotetta ei löydetty.,L59
+209,S-market Lauritsala,S-market,Lappeenranta,Etelä-Karjala,Etelä-Karjalan Osuuskauppa (Eekoo),2026,arvio,,aktiivinen,Mainittu 26.6.2026 tiedotteessa jo toimivana robomyymälänä; ei mukana 11/2024 laajennuksessa → aloitus 12/2024–6/2026. Erillistä tiedotetta ei löydetty.,L59
+210,S-market Peitsari,S-market,Mikkeli,Etelä-Savo,Osuuskauppa Suur-Savo,2024-06-18,päivä,,aktiivinen,,L60;L61
+211,S-market Rantakylä,S-market,Mikkeli,Etelä-Savo,Osuuskauppa Suur-Savo,2024-06-18,päivä,,aktiivinen,,L60;L61
+212,Sale Nuijamies,Sale,Mikkeli,Etelä-Savo,Osuuskauppa Suur-Savo,2024-06-18,päivä,,aktiivinen,,L60;L61
+213,S-market Urpola,S-market,Mikkeli,Etelä-Savo,Osuuskauppa Suur-Savo,2024-08,kuukausi,,aktiivinen,Tiedote 6/2024: laajenee elokuussa 2024 Urpolaan.,L60
+214,Sale Savisilta,Sale,Mikkeli,Etelä-Savo,Osuuskauppa Suur-Savo,2024-11,kuukausi,,aktiivinen,,L61
+215,S-market Laitaatsilta,S-market,Savonlinna,Etelä-Savo,Osuuskauppa Suur-Savo,2024-11,kuukausi,,aktiivinen,,L61
+216,Sale Kontiopuisto,Sale,Pieksämäki,Etelä-Savo,Osuuskauppa Suur-Savo,2024-11,kuukausi,2025-01,lopetettu,Lopetettiin parin kuukauden jälkeen ilkivallan vuoksi (Yle 23.1.2025). Lopetuskuukausi arvio.,L61;L08
+217,S-market Juva,S-market,Juva,Etelä-Savo,Osuuskauppa Suur-Savo,2025-05-27,päivä,,aktiivinen,Ympärivuotinen.,L61
+218,Sale Puumala,Sale,Puumala,Etelä-Savo,Osuuskauppa Suur-Savo,2025-05-27,päivä,,kausikokeilu,"Kesäkokeilu 'ainakin kesäkauden 2025 ajan' (n. 2 000 asukkaan kunta, veneilijät). Yle 27.8.2026 mainitsee robottien kulkeneen Puumalassa kesällä – jatko kesällä 2026 varmistettava.",L61;L62
+219,Sale Kanervala,Sale,Joensuu,Pohjois-Karjala,Pohjois-Karjalan Osuuskauppa (PKO),2026-09-01,päivä,,aktiivinen,Pohjois-Karjala oli Manner-Suomen viimeinen maakunta ilman ruokarobotteja; testiajot elokuussa 2026.,L62
+220,S-market Jouppi,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2025-06,kuukausi,,aktiivinen,Eepeen ensimmäiset robomyymälät kesäkuussa 2025.,L63;L67
+221,S-market Kivistö,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2025-06,kuukausi,,aktiivinen,Eepeen ensimmäiset robomyymälät kesäkuussa 2025.,L63;L67
+222,S-market Tanelinranta,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2025-06,kuukausi,,aktiivinen,Eepeen ensimmäiset robomyymälät kesäkuussa 2025.,L63;L67
+223,S-market Simuna,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2025-06,kuukausi,,aktiivinen,Eepeen ensimmäiset robomyymälät kesäkuussa 2025.,L63;L67
+224,S-market Pajuluoma,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2025-06,kuukausi,,aktiivinen,Eepeen ensimmäiset robomyymälät kesäkuussa 2025.,L63;L67
+225,S-market Alavus,S-market,Alavus,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-06,arvio,,aktiivinen,Tiedote 5.5.2026: 'alkukesästä 2026'; 18.8.2026 tiedote vahvistaa toteutuneen kesällä 2026. Itikanristeys on 4.6.2026 avattu uusi 24 h S-market.,L64;L65;L66
+226,S-market Ilmajoki,S-market,Ilmajoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-06,arvio,,aktiivinen,Tiedote 5.5.2026: 'alkukesästä 2026'; 18.8.2026 tiedote vahvistaa toteutuneen kesällä 2026. Itikanristeys on 4.6.2026 avattu uusi 24 h S-market.,L64;L65;L66
+227,S-market Kauhajoki,S-market,Kauhajoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-06,arvio,,aktiivinen,Tiedote 5.5.2026: 'alkukesästä 2026'; 18.8.2026 tiedote vahvistaa toteutuneen kesällä 2026. Itikanristeys on 4.6.2026 avattu uusi 24 h S-market.,L64;L65;L66
+228,S-market Kurikka,S-market,Kurikka,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-06,arvio,,aktiivinen,Tiedote 5.5.2026: 'alkukesästä 2026'; 18.8.2026 tiedote vahvistaa toteutuneen kesällä 2026. Itikanristeys on 4.6.2026 avattu uusi 24 h S-market.,L64;L65;L66
+229,S-market Lapua,S-market,Lapua,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-06,arvio,,aktiivinen,Tiedote 5.5.2026: 'alkukesästä 2026'; 18.8.2026 tiedote vahvistaa toteutuneen kesällä 2026. Itikanristeys on 4.6.2026 avattu uusi 24 h S-market.,L64;L65;L66
+230,S-market Ähtäri,S-market,Ähtäri,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-06,arvio,,aktiivinen,Tiedote 5.5.2026: 'alkukesästä 2026'; 18.8.2026 tiedote vahvistaa toteutuneen kesällä 2026. Itikanristeys on 4.6.2026 avattu uusi 24 h S-market.,L64;L65;L66
+231,S-market Itikanristeys,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-06,arvio,,aktiivinen,Tiedote 5.5.2026: 'alkukesästä 2026'; 18.8.2026 tiedote vahvistaa toteutuneen kesällä 2026. Itikanristeys on 4.6.2026 avattu uusi 24 h S-market.,L64;L65;L66
+232,S-market Törnävä,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-06,arvio,,aktiivinen,Tiedote 5.5.2026: 'alkukesästä 2026'; 18.8.2026 tiedote vahvistaa toteutuneen kesällä 2026. Itikanristeys on 4.6.2026 avattu uusi 24 h S-market.,L64;L65;L66
+233,S-market Jalasjärvi,S-market,Kurikka,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-08-31,päivä,,aktiivinen,,L65;L66;L67
+234,S-market Kristiinankaupunki,S-market,Kristiinankaupunki,Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-08-31,päivä,,aktiivinen,,L65;L66;L67
+235,S-market Närpiö,S-market,Närpiö,Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-08-31,päivä,,aktiivinen,,L65;L66;L67
+236,S-market Teuva,S-market,Teuva,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-08-31,päivä,,aktiivinen,,L65;L66;L67
+237,S-market Alajärvi,S-market,Alajärvi,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-09-15,päivä,,aktiivinen,Aloitus tietokannan kokoamispäivänä 15.9.2026.,L65;L66;L67
+238,S-market Alakylä,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-09-15,päivä,,aktiivinen,Aloitus tietokannan kokoamispäivänä 15.9.2026.,L65;L66;L67
+239,S-market Kauhava,S-market,Kauhava,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-09-15,päivä,,aktiivinen,Aloitus tietokannan kokoamispäivänä 15.9.2026.,L65;L66;L67
+240,S-market Ylistaro,S-market,Seinäjoki,Etelä-Pohjanmaa,Etelä-Pohjanmaan Osuuskauppa (Eepee),2026-09-15,päivä,,aktiivinen,Aloitus tietokannan kokoamispäivänä 15.9.2026.,L65;L66;L67
+241,S-market Halkokari,S-market,Kokkola,Keski-Pohjanmaa,Osuuskauppa KPO,2025-09-03,päivä,,aktiivinen,KPO:n ensimmäiset robomyymälät.,L68;L69
+242,S-market Kallentori,S-market,Kokkola,Keski-Pohjanmaa,Osuuskauppa KPO,2025-09-03,päivä,,aktiivinen,KPO:n ensimmäiset robomyymälät.,L68;L69
+243,S-market Nivala,S-market,Nivala,Pohjois-Pohjanmaa,Osuuskauppa KPO,2025-09-03,päivä,,aktiivinen,KPO:n ensimmäiset robomyymälät.,L68;L69
+244,S-market Pietarsaari,S-market,Pietarsaari,Pohjanmaa,Osuuskauppa KPO,2025-09-03,päivä,,aktiivinen,KPO:n ensimmäiset robomyymälät.,L68;L69
+245,S-market Gerby,S-market,Vaasa,Pohjanmaa,Osuuskauppa KPO,2025-09-03,päivä,,aktiivinen,KPO:n ensimmäiset robomyymälät.,L68;L69
+246,S-market Ristinummi,S-market,Vaasa,Pohjanmaa,Osuuskauppa KPO,2025-09-03,päivä,,aktiivinen,KPO:n ensimmäiset robomyymälät.,L68;L69
+247,S-market Vaasanpuistikko,S-market,Vaasa,Pohjanmaa,Osuuskauppa KPO,2025-09-03,päivä,,aktiivinen,KPO:n ensimmäiset robomyymälät.,L68;L69
+248,Sale ABC Kokkola,Sale (ABC),Kokkola,Keski-Pohjanmaa,Osuuskauppa KPO,2026-04-29,päivä,,aktiivinen,,L69
+249,Sale ABC Hiekkasärkät,Sale (ABC),Kalajoki,Pohjois-Pohjanmaa,Osuuskauppa KPO,2026-04-29,päivä,,aktiivinen,,L69
+250,S-market Kalajoki,S-market,Kalajoki,Pohjois-Pohjanmaa,Osuuskauppa KPO,2026-04-29,päivä,,aktiivinen,,L69
+251,S-market Laihia,S-market,Laihia,Pohjanmaa,Osuuskauppa KPO,2026-04-29,päivä,,aktiivinen,,L69
+252,S-market Isokyrö,S-market,Isokyrö,Pohjanmaa,Osuuskauppa KPO,2026-04-29,päivä,,aktiivinen,,L69
+253,Sale ABC Pietarsaari,Sale (ABC),Pietarsaari,Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+254,Sale Korsnäs,Sale,Korsnäs,Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+255,Sale Maxmo,Sale,Vöyri,Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+256,Sale Vestersundsby,Sale,Pietarsaari,Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,"KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026). Kunta tarkistettu: Santapellontie 2, Pietarsaari.",L70;L80
+257,S-market Haapajärvi,S-market,Haapajärvi,Pohjois-Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+258,S-market Kannus,S-market,Kannus,Keski-Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+259,S-market Kruunupyy,S-market,Kruunupyy,Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+260,S-market Kälviä,S-market,Kokkola,Keski-Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+261,S-market Kärsämäki,S-market,Kärsämäki,Pohjois-Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+262,S-market Köpings,S-market,Maalahti,Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,"KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026). Kunta tarkistettu: Malminkatu 12, Maalahti.",L70;L80
+263,S-market Lappajärvi,S-market,Lappajärvi,Etelä-Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+264,S-market Luoto,S-market,Luoto,Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+265,S-market Sievi,S-market,Sievi,Pohjois-Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+266,S-market Toholampi,S-market,Toholampi,Keski-Pohjanmaa,Osuuskauppa KPO,2026-08-26,päivä,,aktiivinen,KPO:n laajennuksen 1. vaihe 26.8.2026 (n. 30 myymälää elo–syyskuussa 2026).,L70
+267,Sale ABC Oravainen,Sale (ABC),Vöyri,Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+268,Sale Hakatori,Sale,Kokkola,Keski-Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä). Kunta tarkistettu: Kaarlelankatu 26, Kokkola.",L70;L80
+269,Sale Korsholmanpuistikko,Sale,Vaasa,Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+270,Sale Pännäinen,Sale,Pedersöre,Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä). Kunta tarkistettu: Sursikintie 9, Pedersöre.",L70;L80
+271,Sale Tervajoki,Sale,Vaasa,Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä). Kunta tarkistettu: Loukontie 4, Tervajoki, Vaasa.",L70;L80
+272,S-market Alavieska,S-market,Alavieska,Pohjois-Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+273,S-market Evijärvi,S-market,Evijärvi,Etelä-Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+274,S-market Haapavesi,S-market,Haapavesi,Pohjois-Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+275,S-market Himanka,S-market,Kalajoki,Pohjois-Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+276,S-market Kaustinen,S-market,Kaustinen,Keski-Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+277,S-market Perho,S-market,Perho,Keski-Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+278,S-market Vähäkyrö,S-market,Vaasa,Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70
+279,S-market Vöyri,S-market,Vöyri,Pohjanmaa,Osuuskauppa KPO,2026-09-16,päivä,,tuleva,"KPO:n laajennuksen 2. vaihe, aloitus ilmoitettu 16.9.2026 (tietokannan kokoamispäivää seuraava päivä).",L70

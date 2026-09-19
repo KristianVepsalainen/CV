@@ -1,0 +1,447 @@
+---
+title: "Where did the trade go?"
+subtitle: "Measuring sanctions circumvention exposure across five Nordic countries"
+author: "Kristian Vepsäläinen"
+date: today
+lang: en
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+  pdf:
+    toc: false
+execute:
+  warning: false
+  message: false
+  cache: false
+params:
+  baseline_years: 3
+  last_year: 2025
+  reporters: ["FIN", "SWE", "DNK", "NOR", "ISL"]
+---
+
+```{r setup}
+#| include: false
+library(here)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(purrr)
+library(lubridate)
+library(ggplot2)
+library(knitr)
+
+options(cli.dynamic = FALSE, cli.ansi = FALSE, cli.unicode = FALSE)
+
+cache_dir <- here("data", "cache")
+dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+
+cached <- function(name, expr) {
+  path <- file.path(cache_dir, paste0(name, ".rds"))
+  if (file.exists(path)) return(readRDS(path))
+  val <- force(expr)
+  if (NROW(val) == 0) {
+    warning("Empty result for '", name, "' — not cached.")
+    return(val)
+  }
+  saveRDS(val, path)
+  val
+}
+```
+
+## The question
+
+Sanctions on exports to Russia apply to the same goods across the EU and,
+through aligned national measures, across Norway and Iceland. The rules are
+common; exposure to their circumvention is not. A country's exposure
+depends on what it exported to Russia before the restrictions, who its
+neighbours are, and how much of that trade re-appeared shortly afterwards
+in countries that had never bought it in any quantity.
+
+This report measures that re-appearance in five Nordic countries, using
+one metric applied identically to each.
+
+## Method
+
+Circumvention through a third country leaves a specific trace in customs
+statistics. Exports of a restricted good to Russia fall to near zero, while
+exports of the same good to a small number of transit economies rise far
+beyond anything those economies could plausibly consume. The goods are not
+consumed there; they are forwarded.
+
+Three things make this measurable rather than suggestive:
+
+**The goods are defined by the legislation, not by me.** The restricted
+product codes are enumerated in the annexes of the EU sanctions
+regulations, and the headline list is already published at the resolution
+trade data uses. Part 1 extracts the codes and the date each one became
+restricted; this part counts them. Choosing codes by hand would make any
+finding an artefact of that choice.
+
+**The comparison is against the country's own past, code by code.** Each
+flow is measured against its own baseline in the years before that
+particular code was restricted. A country that always traded heavily with
+Central Asia is therefore not flagged for continuing to do so, and a code
+restricted in 2025 is not judged against a 2022 boundary.
+
+**A control group absorbs the rest.** Trade to partners with no plausible
+onward route to Russia grew or shrank over the same period for ordinary
+economic reasons. Differencing against that control removes the part of the
+change that is simply the world economy.
+
+## Part 1 — What the legislation defines
+
+```{r codes}
+# Two lists, because they are two different animals.
+#
+# The Common High Priority list is carried in the sanctions regulation
+# itself, as Annex XL of Regulation 833/2014 (and Annex XXX of 765/2006 for
+# Belarus). It holds 50 items in four tiers and — decisively here — it is
+# expressed in six-digit HS codes, the same resolution as international
+# trade data. It was drawn up jointly by the EU, US, UK and Japan
+# specifically to support anti-circumvention work, so it is the list
+# enforcement agencies themselves watch. No truncation is needed.
+#
+# The vehicle codes used for validation come from the industrial goods
+# annex instead, at eight digits, and are truncated to HS6. That truncation
+# is confined to the validation and never touches the headline measurement.
+chp_codes <- tribble(
+  ~hs6,     ~description,                ~tier, ~regulation, ~annex, ~effective,
+  "TODO",   "TODO — from Annex XL",      1L,    "833/2014",  "XL",   "TODO",
+) |>
+  mutate(list = "CHP", cn8_truncated = FALSE)
+
+anchor_codes_tbl <- tribble(
+  ~hs6,     ~description,                              ~regulation, ~annex,  ~effective,
+  "870421", "Motor vehicles for goods, diesel, <=5t",  "833/2014",  "XXIII", "TODO",
+  "870422", "Motor vehicles for goods, diesel, 5-20t", "833/2014",  "XXIII", "TODO",
+  "871620", "Trailers and semi-trailers",              "833/2014",  "XXIII", "TODO",
+) |>
+  mutate(tier = NA_integer_, list = "Industrial", cn8_truncated = TRUE)
+
+restricted_codes <- bind_rows(chp_codes, anchor_codes_tbl) |>
+  mutate(effective = as.Date(effective))
+
+# A missing effective date is not a cosmetic gap: without it the code has no
+# baseline and would silently be dropped or, worse, compared against the
+# wrong years.
+stopifnot(!any(is.na(restricted_codes$effective)),
+          !any(restricted_codes$hs6 == "TODO"))
+
+restricted_codes |>
+  count(list, annex, cn8_truncated, name = "codes") |>
+  kable(caption = "Restricted goods carried into the measurement")
+```
+
+Codes carry their own start date because the restrictions did not arrive at
+once. Twenty-one sanctions packages had been adopted by August 2026, each
+one amending the annexes: entries added, codes refined, thresholds revised.
+A code restricted from 2023 and a code restricted from 2025 cannot share a
+single before-and-after boundary without mixing restricted and unrestricted
+years inside the same comparison.
+
+```{r windows}
+# Each code gets its own baseline and its own post period. The year the
+# restriction takes effect is dropped: it is part restricted and part not,
+# and assigning it to either side would bias the comparison in a direction
+# that depends on the month of adoption.
+code_windows <- restricted_codes |>
+  mutate(
+    eff_year  = year(effective),
+    pre_from  = eff_year - params$baseline_years,
+    pre_to    = eff_year - 1,
+    post_from = eff_year + 1,
+    post_to   = params$last_year,
+    pre_width  = pre_to - pre_from + 1,
+    post_width = post_to - post_from + 1
+  ) |>
+  filter(post_width >= 1)
+
+dropped <- nrow(restricted_codes) - nrow(code_windows)
+if (dropped > 0) {
+  message(dropped, " code(s) restricted too recently to have a post period ",
+          "and excluded.")
+}
+
+code_windows |>
+  count(eff_year, name = "codes") |>
+  arrange(eff_year) |>
+  kable(caption = "When each batch of codes became restricted")
+```
+
+```{r policy_events}
+# Part 1's second output: obligations whose effect Part 2 can test.
+# Article 12gb of Regulation 833/2014 is the interesting one, because it
+# does not restrict a good — it obliges exporters to take active steps
+# against circumvention of the CHP items specifically. If that obligation
+# bites, its effect should appear in CHP flows and not in the others, which
+# is a sharper prediction than "sanctions reduce trade".
+policy_events <- tribble(
+  ~date,        ~event,                                              ~source,
+  "2022-02-24", "Full-scale invasion; sectoral packages begin",       "TODO",
+  "2024-12-26", "Art. 12gb anti-circumvention duty applies (Russia)", "TODO",
+) |>
+  mutate(date = as.Date(date))
+
+policy_events |> kable(caption = "Obligations tested in Part 2")
+```
+
+## Part 2 — What the trade data shows
+
+### Partner groups
+
+```{r partners}
+# Transit economies are the ones repeatedly identified in EU and national
+# enforcement reporting as onward routes to Russia. The list is a stated
+# assumption, not a finding, and the results are re-run without each one in
+# the sensitivity section.
+transit_hubs <- c("ARM", "KAZ", "KGZ", "GEO", "UZB", "TUR", "ARE", "SRB")
+
+# Controls: economies of comparable income and distance with no land or
+# practical onward route to Russia. They absorb ordinary trade growth.
+control_partners <- c("MAR", "TUN", "JOR", "THA", "MYS", "CHL", "ZAF")
+
+target <- "RUS"
+```
+
+### Data
+
+```{r trade_data}
+# UN Comtrade is used for all five reporters rather than Eurostat, because
+# Norway and Iceland are outside Comext and a cross-country comparison built
+# from two different collection systems would confound the measurement with
+# the measurement apparatus. Comext at CN8 is the better source for the
+# three EU members alone and belongs in the robustness check.
+#
+# comtradr::set_primary_comtrade_key() needs a free API key.
+library(comtradr)
+
+years <- seq(min(code_windows$pre_from), params$last_year)
+
+fetch_flow <- function(reporter, year) {
+  cached(sprintf("trade_%s_%d", reporter, year), {
+    ct_get_data(
+      reporter       = reporter,
+      partner        = c(target, transit_hubs, control_partners),
+      commodity_code = unique(code_windows$hs6),
+      start_date     = year,
+      end_date       = year,
+      flow_direction = "export",
+      freq           = "A"
+    )
+  })
+}
+
+trade <- expand_grid(reporter = params$reporters, year = years) |>
+  pmap(function(reporter, year) {
+    out <- tryCatch(fetch_flow(reporter, year), error = function(e) {
+      warning(reporter, " ", year, ": ", conditionMessage(e))
+      NULL
+    })
+    if (is.null(out) || NROW(out) == 0) return(NULL)
+    out |>
+      transmute(
+        reporter = reporter_iso,
+        partner  = partner_iso,
+        year     = as.integer(ref_year),
+        hs6      = as.character(cmd_code),
+        value    = primary_value
+      )
+  }) |>
+  bind_rows()
+
+stopifnot(NROW(trade) > 0)
+
+message("Observations: ", nrow(trade),
+        " | reporters: ", n_distinct(trade$reporter),
+        " | years: ", paste(range(trade$year), collapse = "-"))
+```
+
+## The metric
+
+```{r windowing}
+group_of <- function(p) {
+  case_when(p == target ~ "russia",
+            p %in% transit_hubs ~ "hub",
+            p %in% control_partners ~ "control",
+            TRUE ~ NA_character_)
+}
+
+# Each observation is assigned to the pre or post window of its own code.
+windowed <- trade |>
+  inner_join(select(code_windows, hs6, pre_from, pre_to, post_from, post_to,
+                    pre_width, post_width, list),
+             by = "hs6") |>
+  mutate(
+    group = group_of(partner),
+    period = case_when(
+      year >= pre_from  & year <= pre_to  ~ "pre",
+      year >= post_from & year <= post_to ~ "post",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(group), !is.na(period))
+
+# Annualising divides by the width of the window, not by the number of years
+# actually observed. A year with no exports is a missing row in Comtrade
+# rather than a zero, so dividing by observed years would quietly inflate
+# the average for exactly the flows that stopped — which is the effect being
+# measured.
+annual <- windowed |>
+  group_by(reporter, hs6, list, group, period) |>
+  summarise(total = sum(value),
+            width = first(if_else(period == "pre", pre_width, post_width)),
+            .groups = "drop") |>
+  mutate(annual_value = total / width) |>
+  select(reporter, hs6, list, group, period, annual_value) |>
+  pivot_wider(names_from = period, values_from = annual_value,
+              values_fill = 0)
+```
+
+```{r metric}
+# Control growth is what ordinary trade did over the same window for this
+# reporter and this good. Hub growth is only interesting in excess of it.
+control_growth <- annual |>
+  filter(group == "control") |>
+  transmute(reporter, hs6,
+            control_factor = if_else(pre > 0, post / pre, NA_real_))
+
+diversion <- annual |>
+  filter(group %in% c("russia", "hub")) |>
+  select(reporter, hs6, list, group, pre, post) |>
+  pivot_wider(names_from = group, values_from = c(pre, post), values_fill = 0) |>
+  left_join(control_growth, by = c("reporter", "hs6")) |>
+  mutate(
+    russia_lost = pmax(pre_russia - post_russia, 0),
+    # What hub exports would have been had they merely followed ordinary
+    # trade growth for this reporter and good.
+    hub_expected = pre_hub * coalesce(control_factor, 1),
+    hub_excess   = post_hub - hub_expected,
+    # The headline: how much of the lost Russian trade re-appears as excess
+    # exports to transit economies. Not a measure of guilt — a measure of
+    # how much volume would need another explanation.
+    diversion_ratio = if_else(russia_lost > 0, hub_excess / russia_lost, NA_real_)
+  )
+
+diversion |>
+  filter(!is.na(diversion_ratio)) |>
+  group_by(reporter) |>
+  summarise(
+    goods         = n(),
+    lost_to_ru    = sum(russia_lost),
+    excess_to_hub = sum(hub_excess),
+    ratio         = sum(hub_excess) / sum(russia_lost),
+    .groups = "drop"
+  ) |>
+  arrange(desc(ratio)) |>
+  mutate(across(c(lost_to_ru, excess_to_hub), ~ round(.x / 1e6)),
+         ratio = round(ratio, 2)) |>
+  kable(caption = "Diversion ratio by country (values in EUR million per year)")
+```
+
+A ratio near zero means the trade simply stopped. A ratio near one means an
+amount equivalent to the entire lost Russian trade re-appeared elsewhere,
+beyond what ordinary growth explains.
+
+```{r by_list}
+# The CHP items are the ones subject to the Article 12gb duty. Splitting the
+# ratio by list is the closest this data comes to testing whether an
+# obligation aimed at exporters, rather than at goods, changed anything.
+diversion |>
+  filter(!is.na(diversion_ratio)) |>
+  group_by(reporter, list) |>
+  summarise(ratio = sum(hub_excess) / sum(russia_lost), .groups = "drop") |>
+  pivot_wider(names_from = list, values_from = ratio) |>
+  mutate(across(where(is.numeric), ~ round(.x, 2))) |>
+  kable(caption = "Diversion ratio by code list")
+```
+
+## Validation
+
+```{r validation}
+# In July 2026 a Finnish district court convicted a company director of an
+# aggravated regulation offence for exporting 164 trucks and trailers to
+# Russia in 2022-2023, declared as sales to buyers registered in Turkey and
+# Kazakhstan. The prosecution rested on investigative work, not on trade
+# statistics. If this metric measures what it claims to, the pattern should
+# be visible in Finnish exports of those goods to those two partners years
+# before the judgment.
+anchor_hs6 <- anchor_codes_tbl$hs6
+anchor_partners <- c("TUR", "KAZ")
+
+trade |>
+  filter(reporter == "FIN", hs6 %in% anchor_hs6,
+         partner %in% c(anchor_partners, target)) |>
+  group_by(year, partner) |>
+  summarise(value = sum(value) / 1e6, .groups = "drop") |>
+  ggplot(aes(year, value, colour = partner)) +
+  geom_line(linewidth = 1) +
+  geom_point() +
+  geom_vline(data = policy_events, aes(xintercept = year(date)),
+             linetype = "dashed") +
+  labs(x = NULL, y = "Exports, EUR million", colour = NULL,
+       caption = paste("Finnish exports of trucks and trailers.",
+                       "Dashed lines: statutory dates from Part 1.")) +
+  theme_minimal()
+```
+
+This is the honest test of the whole approach. If the anchor pattern is
+absent, the metric does not detect a case that is known to have happened,
+and that has to be reported as such rather than explained away. If it is
+present, an open-data method flagged, years earlier, a case the authorities
+reached through investigation.
+
+## Sensitivity
+
+```{r sensitivity}
+# The hub list is the most arguable choice in the report. Each country is
+# removed in turn to see whether any single partner carries the result.
+ratio_without <- function(dropped_hub) {
+  hubs <- setdiff(transit_hubs, dropped_hub)
+  windowed |>
+    mutate(group = case_when(partner == target ~ "russia",
+                             partner %in% hubs ~ "hub",
+                             partner %in% control_partners ~ "control",
+                             TRUE ~ NA_character_)) |>
+    filter(!is.na(group)) |>
+    group_by(reporter, group, period) |>
+    summarise(total = sum(value),
+              width = first(if_else(period == "pre", pre_width, post_width)),
+              .groups = "drop") |>
+    mutate(v = total / width) |>
+    select(reporter, group, period, v) |>
+    pivot_wider(names_from = c(group, period), values_from = v,
+                values_fill = 0) |>
+    transmute(reporter, dropped = dropped_hub,
+              ratio = (hub_post - hub_pre) / pmax(russia_pre - russia_post, 1))
+}
+
+map_dfr(c("none", transit_hubs), ratio_without) |>
+  pivot_wider(names_from = reporter, values_from = ratio) |>
+  mutate(across(where(is.numeric), ~ round(.x, 2))) |>
+  kable(caption = "Diversion ratio with each transit economy removed in turn")
+```
+
+## Limitations
+
+- A diversion ratio is not evidence of circumvention. It measures volume
+  that ordinary trade growth does not explain, which is a reason to look,
+  not a finding of fact.
+- The headline measurement uses the Common High Priority list, which is
+  published at six digits and needs no truncation. The vehicle codes used
+  for validation are truncated from eight digits to six, so restricted and
+  unrestricted goods are counted together there.
+- Baselines differ in length across codes where a code was restricted too
+  recently for a full window, and a code with no post period at all is
+  excluded. Both are reported in the output rather than averaged away.
+- Mirror statistics disagree. What Finland records as an export to
+  Kazakhstan and what Kazakhstan records as an import from Finland are
+  frequently different numbers, and neither is authoritative.
+- Transit trade is recorded inconsistently between countries, which is
+  precisely the mechanism at issue in the Finnish case, where transit was
+  not covered by the sanctions in force at the time.
+- The transit-hub list is an assumption carried in from enforcement
+  reporting. The sensitivity table shows how much rests on it.
+- Goods routed through a country that is neither a hub on this list nor a
+  control are invisible to this method entirely.

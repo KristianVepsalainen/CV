@@ -14,11 +14,16 @@ format:
 execute:
   warning: false
   message: false
-  cache: true
+  # knitr's chunk cache is deliberately off. The expensive steps — the
+  # country extract, the population grid, the postal geometries — are cached
+  # on disk by cached() instead, which the analysis controls explicitly.
+  # knitr's cache does not track objects across chunks unless every
+  # dependency is declared, so editing one chunk silently restored stale
+  # objects into the next one.
+  cache: false
 params:
   radius_m: 3000
   n_shortlist: 20
-  overpass_timeout: 300
 ---
 
 ```{r setup}
@@ -30,12 +35,16 @@ library(stringr)
 library(purrr)
 library(sf)
 library(fst)
-library(osmdata)
+library(osmextract)
 library(geofi)
 library(ggplot2)
+library(readr)
 library(knitr)
 
 sf_use_s2(FALSE)
+# cli's dynamic console output is useless in a rendered document and is a
+# recurring source of spurious errors during long runs.
+options(cli.dynamic = FALSE, cli.ansi = FALSE, cli.unicode = FALSE)
 
 cache_dir <- here("data", "cache")
 dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
@@ -46,8 +55,26 @@ cached <- function(name, expr) {
   path <- file.path(cache_dir, paste0(name, ".rds"))
   if (file.exists(path)) return(readRDS(path))
   val <- force(expr)
+  # Never cache an empty result. A failed fetch that gets cached looks
+  # exactly like a successful fetch of nothing on every later run.
+  n <- if (is.null(val)) 0 else NROW(val)
+  if (n == 0) {
+    warning("Empty result for '", name, "' — not cached.")
+    return(val)
+  }
   saveRDS(val, path)
   val
+}
+
+# Different spatial sources name the geometry column differently ("geom"
+# from WFS, "geometry" from most R packages). Normalise it once so that
+# downstream code can refer to it by a fixed name.
+set_geom_name <- function(x, name = "geometry") {
+  current <- attr(x, "sf_column")
+  if (identical(current, name)) return(x)
+  names(x)[names(x) == current] <- name
+  st_geometry(x) <- name
+  x
 }
 ```
 
@@ -70,7 +97,7 @@ which assumptions would be replaced by measurement.
 | Paavo postal code statistics | Statistics Finland | Population, age structure, income |
 | Postal area geometries | Statistics Finland / `geofi` | Allocating population to service areas |
 | Stores, pedestrian network, crossings | OpenStreetMap / Overpass | Locations, drivability |
-| Current robot locations | Regional co-op press releases | Model validation |
+| Robot locations and start dates | Regional co-op press releases | Model validation |
 
 ### Paavo
 
@@ -119,7 +146,10 @@ paavo <- paavo_raw |>
   # enter the join more than once and population would multiply.
   filter(year == max(year, na.rm = TRUE)) |>
   mutate(
-    zip = str_pad(as.character(zip), 5, pad = "0"),
+    # PxWeb exports often carry the code and the area name in one field
+    # ("00100 Helsinki Keskusta"), so the five-digit code is extracted rather
+    # than assumed. A silently failed join here empties the whole analysis.
+    zip = str_pad(str_extract(as.character(zip), "\\d{5}"), 5, pad = "0"),
     working_age = age_25_29 + age_30_34 + age_35_39 + age_40_44 +
                   age_45_49 + age_50_54 + age_55_59 + age_60_64
   ) |>
@@ -135,67 +165,186 @@ message("Median postal area: ", format(median(paavo$area_m2, na.rm = TRUE),
         big.mark = " "))
 
 zip_geom <- cached("zip_geom", {
-  geofi::get_zipcodes(year = 2023) |>
-    select(zip = posti_alue, geom = geometry) |>
+  z <- geofi::get_zipcodes(year = 2023)
+  # The Statistics Finland WFS calls its geometry column "geom", other
+  # sources call it "geometry". The sf geometry column is sticky in
+  # select(), so it must never be named there; instead the name is
+  # normalised once, here, and the rest of the document can rely on it.
+  z <- set_geom_name(z)
+  z |>
+    select(zip = posti_alue) |>
     st_transform(3067)
 })
 
 zips <- zip_geom |>
-  left_join(paavo, by = "zip") |>
+  left_join(paavo, by = "zip")
+
+# Fail loudly on a bad join. Without this the population column is all NA,
+# every downstream filter empties out, and the document renders with correct
+# code and blank tables.
+matched <- mean(!is.na(zips$population))
+if (matched < 0.8) {
+  stop(sprintf(
+    "Only %.0f%% of postal areas matched Paavo. Check the zip formats: %s vs %s",
+    100 * matched,
+    paste(head(zip_geom$zip, 3), collapse = ", "),
+    paste(head(paavo$zip, 3), collapse = ", ")
+  ))
+}
+
+zips <- zips |>
   filter(!is.na(population), population > 0) |>
   st_make_valid() |>
   mutate(zip_area = as.numeric(st_area(geometry)))
 ```
 
 Paavo reports population by postal area, but a service area is a circle
-around a store. The two are intersected and population is allocated in
-proportion to overlapping area. This assumes population is spread evenly
-within a postal area, which is wrong in sparsely settled regions and
-overstates stores on the edge of large areas. The 250 m population grid
-would fix this at the cost of a heavier download and more processing; in
-this version the assumption is stated rather than hidden.
+around a store, so the two have to be reconciled. An earlier version of
+this analysis allocated population by overlapping area, which assumes
+people are spread evenly inside a postal area. That assumption failed
+visibly in the north: a 3 km circle around the store in Kittilä was
+credited with 72 residents, because the postal area covers thousands of
+square kilometres and almost everyone in it lives in the centre.
+
+Absolute population is therefore taken from the 1 km population grid, which
+records where people actually live. Paavo is still used, but only for
+composition — the working-age share and the share of households that order
+groceries — because ratios are far less sensitive to the even-spread
+assumption than counts are.
 
 ### Stores from OpenStreetMap
 
 ```{r stores}
 # S Group chains. Sale and S-market have served as robot origin points;
 # Prisma is included because its assortment supports online orders.
-sgroup_brands <- c("S-market", "Prisma", "Sale", "Alepa", "Food Market Herkku")
+sgroup_pattern <- "^(S-market|Prisma|Sale|Alepa|Food Market Herkku|Sokos Herkku)\\b"
 
-fetch_stores <- function(brand) {
-  opq(bbox = c(19.0, 59.7, 31.6, 70.1), timeout = params$overpass_timeout) |>
-    add_osm_features(features = c(
-      sprintf('"brand"="%s"', brand),
-      sprintf('"name"~"^%s"', brand)
-    )) |>
-    osmdata_sf()
+# Stores come from the Geofabrik country extract rather than the Overpass
+# API. Overpass is convenient but rate limited, and a work sample whose
+# results depend on how a third party's server happens to behave on a given
+# afternoon is not reproducible. The extract is downloaded once and cached
+# by osmextract; anyone re-running this gets the same rows.
+osm_dir <- here("data", "osm")
+dir.create(osm_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Stores are selected by name, not by the shop tag. A large share of Finnish
+# grocery stores in OSM carry a name but no shop tag, or are mapped only as
+# a building outline, so filtering on shop silently dropped roughly half of
+# them — including towns that demonstrably have a store. The chain names are
+# distinctive enough to do the work on their own.
+sgroup_prefixes <- c("S-market", "Prisma", "Sale", "Alepa",
+                     "Food Market Herkku", "Sokos Herkku")
+
+name_sql <- function(layer) {
+  conds <- paste0("name LIKE '", sgroup_prefixes, "%'", collapse = " OR ")
+  # osm_way_id exists only in the multipolygons layer; asking for it on
+  # points makes the query fail outright.
+  cols <- if (layer == "multipolygons") {
+    "osm_id, osm_way_id, name, shop, brand, operator, geometry"
+  } else {
+    "osm_id, name, shop, brand, operator, geometry"
+  }
+  paste0("SELECT ", cols, " FROM ", layer, " WHERE ", conds)
+}
+
+read_osm_shops <- function(layer) {
+  osmextract::oe_get(
+    "Finland",
+    layer = layer,
+    query = name_sql(layer),
+    download_directory = osm_dir,
+    quiet = FALSE
+  ) |>
+    mutate(src = layer)
 }
 
 stores_raw <- cached("stores_osm", {
-  map(sgroup_brands, function(b) {
-    res <- tryCatch(fetch_stores(b), error = function(e) NULL)
-    if (is.null(res)) return(NULL)
-    pts <- res$osm_points
-    polys <- res$osm_polygons
-    bind_rows(
-      if (!is.null(pts) && nrow(pts) > 0) st_as_sf(pts) else NULL,
-      if (!is.null(polys) && nrow(polys) > 0) st_centroid(st_as_sf(polys)) else NULL
-    ) |>
-      mutate(chain = b)
-  }) |>
-    bind_rows()
+  pts <- read_osm_shops("points") |> filter(!is.na(name))
+
+  polys <- read_osm_shops("multipolygons") |>
+    filter(!is.na(name)) |>
+    st_make_valid() |>
+    (\(x) suppressWarnings(st_centroid(x)))()
+
+  message("Shops in extract: ", nrow(pts), " points, ",
+          nrow(polys), " polygons")
+
+  bind_rows(pts, polys)
 })
 
-stores <- stores_raw |>
-  filter(!is.na(name)) |>
-  select(any_of(c("osm_id", "name", "brand", "operator", "addr:city", "chain"))) |>
-  rename(city = any_of("addr:city")) |>
-  st_transform(3067) |>
-  distinct(name, chain, .keep_all = TRUE)
+stopifnot(nrow(stores_raw) > 0)
 
-# Check this before trusting any number downstream: OSM brand and name
-# tagging is uneven, and a misclassified chain propagates straight into
-# the result.
+stores <- stores_raw |>
+  filter(!is.na(name), str_detect(name, sgroup_pattern)) |>
+  mutate(
+    chain = str_extract(name, sgroup_pattern),
+    # In the multipolygons layer osm_id is populated only for relations; a
+    # store mapped as a closed way carries its id in osm_way_id and has
+    # osm_id = NA. Deduplicating on osm_id alone therefore collapsed every
+    # building-mapped store in the country into a single row, which is why
+    # towns with an obvious store appeared to have none.
+    uid = paste(
+      src,
+      coalesce(as.character(osm_id),
+               if ("osm_way_id" %in% names(stores_raw))
+                 as.character(osm_way_id) else NA_character_),
+      sep = ":"
+    )
+  ) |>
+  select(any_of(c("uid", "name", "brand", "operator", "chain"))) |>
+  set_geom_name() |>
+  st_transform(3067) |>
+  distinct(uid, .keep_all = TRUE)
+
+# A single store often appears more than once: as a node and again as the
+# building around it, or as several POIs inside one Prisma (entrance, info
+# desk). Collapse anything of the same chain within 100 m into one store.
+store_clusters <- stores |>
+  st_buffer(100) |>
+  st_union() |>
+  st_cast("POLYGON") |>
+  st_as_sf() |>
+  mutate(cluster_id = row_number()) |>
+  set_geom_name()
+
+stores <- stores |>
+  st_join(store_clusters, join = st_within) |>
+  group_by(cluster_id, chain) |>
+  slice(1) |>
+  ungroup()
+
+message("Stores after deduplication: ", nrow(stores))
+
+# City comes from a spatial join, not from OSM's addr:city tag. That tag is
+# absent on a large share of Finnish shop nodes, and because the served /
+# not-served flag is keyed on city, a sparse tag would quietly corrupt the
+# validation rather than raise an error.
+municipalities <- cached("municipalities", {
+  geofi::get_municipalities(year = 2023) |> set_geom_name()
+})
+
+city_col <- intersect(c("municipality_name_fi", "name_fi", "nimi", "name"),
+                      names(municipalities))[1]
+
+muni_geom <- municipalities |>
+  select(city = all_of(city_col)) |>
+  st_transform(3067)
+
+stores <- stores |>
+  st_join(muni_geom, join = st_within)
+
+# Coastline simplification leaves a handful of stores just outside every
+# municipality polygon. Left as NA they would silently count as not served,
+# so they are assigned to the nearest municipality instead.
+if (any(is.na(stores$city))) {
+  gap <- is.na(stores$city)
+  nearest <- st_nearest_feature(stores[gap, ], muni_geom)
+  stores$city[gap] <- muni_geom$city[nearest]
+}
+
+message("S Group stores identified: ", nrow(stores),
+        " | without a city match: ", sum(is.na(stores$city)))
+
 stores |>
   st_drop_geometry() |>
   count(chain, sort = TRUE) |>
@@ -210,38 +359,43 @@ results are read.
 ### Current robot locations
 
 ```{r served}
-# Compiled from regional co-op and SOK press releases. Complete the gaps;
-# this list is the model's only validation anchor.
-served_towns <- tribble(
-  ~city,           ~coop,
-  "Helsinki",      "HOK-Elanto",
-  "Espoo",         "HOK-Elanto",
-  "Vantaa",        "HOK-Elanto",
-  "Tampere",       "Pirkanmaa",
-  "Turku",         "TOK",
-  "Kaarina",       "TOK",
-  "Naantali",      "TOK",
-  "Raisio",        "TOK",
-  "Parainen",      "TOK",
-  "Uusikaupunki",  "TOK",
-  "Pori",          "Satakunta",
-  "Rauma",         "Satakunta",
-  "Jyväskylä",     "Keskimaa",
-  "Oulu",          "Arina",
-  "Lahti",         "Hämeenmaa",
-  "Heinola",       "Hämeenmaa",
-  "Riihimäki",     "Hämeenmaa",
-  "Hämeenlinna",   "Hämeenmaa",
-  "Forssa",        "Hämeenmaa",
-  "Kotka",         "Kymen Seutu",
-  "Kouvola",       "Kymen Seutu",
-  "Siilinjärvi",   "PeeÄssä",
-  "Kuopio",        "PeeÄssä",
-  "Joensuu",       "PKO"
+# Compiled from regional co-op and SOK press releases: 47 municipalities,
+# each with the date of its first robot delivery and the source it came
+# from. This list is the model's only validation anchor, so it is kept as a
+# data file with citations rather than buried in code.
+served_towns <- readr::read_csv(
+  here("data", "served", "s-ryhma_ruokarobotti_kunnat_2026.csv"),
+  show_col_types = FALSE
 )
+
+# Start dates arrive at three precisions: full date, year and month, or year
+# only. The coarser ones are placed mid-period, which is accurate enough for
+# a rank correlation and wrong for anything finer.
+parse_start <- function(x) {
+  dashes <- str_count(x, "-")
+  as.Date(case_when(
+    dashes == 2 ~ x,
+    dashes == 1 ~ paste0(x, "-15"),
+    TRUE        ~ paste0(x, "-07-01")
+  ))
+}
+
+served_towns <- served_towns |>
+  mutate(
+    start = parse_start(aloituspaiva),
+    # Rows whose source could not be pinned to a specific press release are
+    # marked in the source field. They are kept, because leaving a genuinely
+    # served town out of the anchor is the worse error, but they are
+    # separable so their influence can be measured instead of assumed.
+    confirmed = !str_detect(lahde_id, regex("vahvistamaton", ignore_case = TRUE)),
+    city = kunta
+  )
 
 stores <- stores |>
   mutate(served = city %in% served_towns$city)
+
+message("Served municipalities on file: ", nrow(served_towns),
+        " | stores in them: ", sum(stores$served))
 ```
 
 ## Scoring
@@ -263,8 +417,42 @@ buffers <- stores |>
   st_buffer(params$radius_m) |>
   mutate(buffer_id = row_number())
 
-# Population inside the service area, area-weighted
-pop_in_service_area <- st_intersection(
+# Absolute population comes from the 1 km population grid, not from postal
+# areas. Area weighting assumes people are spread evenly inside a postal
+# area; in northern municipalities one postal area can cover thousands of
+# square kilometres with everyone living in the centre, so a 3 km circle was
+# credited with a few dozen residents where the real figure is thousands.
+# The grid measures where people actually are.
+pop_grid <- cached("pop_grid", {
+  geofi::get_population_grid(year = 2022, resolution = 1) |>
+    set_geom_name() |>
+    st_transform(3067)
+})
+
+grid_pop_col <- intersect(
+  c("vaesto", "population", "he_vakiy", "vaesto_lkm", "asukkaita"),
+  names(pop_grid)
+)[1]
+if (is.na(grid_pop_col)) {
+  stop("No population column found in the grid: ",
+       paste(names(pop_grid), collapse = ", "))
+}
+
+grid_population <- pop_grid |>
+  transmute(grid_pop = .data[[grid_pop_col]]) |>
+  # Cells with very few residents are suppressed and can appear as negative
+  # sentinel values; they are floored at zero rather than dropped.
+  mutate(grid_pop = pmax(coalesce(as.numeric(grid_pop), 0), 0)) |>
+  st_centroid() |>
+  st_join(buffers |> select(buffer_id), join = st_within) |>
+  st_drop_geometry() |>
+  filter(!is.na(buffer_id)) |>
+  group_by(buffer_id) |>
+  summarise(population = sum(grid_pop, na.rm = TRUE), .groups = "drop")
+
+# Paavo is still used, but only for composition. Shares are far less
+# sensitive to the even-spread assumption than absolute counts are.
+paavo_shares <- st_intersection(
   buffers |> select(buffer_id),
   zips |> select(zip, population, working_age, households, hh_young_single,
                  hh_small_child, hh_rental, dwell_apartment, dwellings,
@@ -275,62 +463,98 @@ pop_in_service_area <- st_intersection(
   group_by(buffer_id) |>
   summarise(
     across(
-      c(population, working_age, households, hh_young_single, hh_small_child,
-        hh_rental, dwell_apartment, dwellings, students, jobs,
-        purchasing_power),
+      c(population, working_age, hh_young_single, hh_small_child, students),
       ~ sum(.x * share, na.rm = TRUE)
     ),
     .groups = "drop"
+  ) |>
+  transmute(
+    buffer_id,
+    working_age_share = working_age / pmax(population, 1),
+    orderer_share = (hh_young_single + hh_small_child + students) /
+                    pmax(population, 1)
   )
+
+pop_in_service_area <- grid_population |>
+  inner_join(paavo_shares, by = "buffer_id") |>
+  mutate(working_age = population * working_age_share)
 ```
 
 ```{r osm_network}
-# Pedestrian network and crossings are fetched only for leading
-# candidates: pulling the whole country from Overpass is neither
-# necessary nor polite.
+# The pedestrian network comes from the same local extract, so the whole
+# analysis depends on one downloaded file and no live service.
+#
+# Every store is scored. An earlier version kept only the 120 largest
+# service areas to limit the number of network requests; with the data held
+# locally that limit has no purpose, and it was actively harmful: the
+# largest service areas are the big cities, which are already served, so the
+# shortlist of candidates was empty by construction.
 candidates <- buffers |>
   left_join(pop_in_service_area, by = "buffer_id") |>
-  filter(!is.na(population)) |>
-  arrange(desc(population)) |>
-  slice_head(n = 120)
+  filter(!is.na(population))
 
-fetch_network <- function(geom_wgs) {
-  bb <- st_bbox(geom_wgs)
-  q <- opq(bbox = as.numeric(bb), timeout = params$overpass_timeout)
-  paths <- tryCatch(
-    q |> add_osm_feature("highway",
-        c("footway", "path", "pedestrian", "living_street", "cycleway")) |>
-      osmdata_sf(),
-    error = function(e) NULL)
-  crossings <- tryCatch(
-    q |> add_osm_feature("highway", "crossing") |> osmdata_sf(),
-    error = function(e) NULL)
-  list(paths = paths, crossings = crossings)
-}
+message("Scoring ", nrow(candidates), " stores, of which ",
+        sum(candidates$served), " already served")
 
-network <- cached("network_osm", {
-  candidates |>
-    st_transform(4326) |>
-    st_geometry() |>
-    map(fetch_network)
+path_types <- c("footway", "path", "pedestrian", "living_street", "cycleway")
+
+paths <- cached("paths_osm", {
+  osmextract::oe_get(
+    "Finland",
+    layer = "lines",
+    query = paste0(
+      "SELECT osm_id, highway, geometry FROM lines WHERE highway IN (",
+      paste0("'", path_types, "'", collapse = ", "), ")"
+    ),
+    download_directory = osm_dir,
+    quiet = FALSE
+  ) |>
+    st_transform(3067)
 })
 
-network_metrics <- map2_dfr(network, candidates$buffer_id, function(v, id) {
-  path_km <- 0
-  if (!is.null(v$paths) && !is.null(v$paths$osm_lines) &&
-      nrow(v$paths$osm_lines) > 0) {
-    path_km <- v$paths$osm_lines |>
-      st_transform(3067) |>
-      st_length() |>
-      sum() |>
-      as.numeric() / 1000
-  }
-  n_crossings <- 0
-  if (!is.null(v$crossings) && !is.null(v$crossings$osm_points)) {
-    n_crossings <- nrow(v$crossings$osm_points)
-  }
-  tibble(buffer_id = id, path_km = path_km, n_crossings = n_crossings)
+crossings <- cached("crossings_osm", {
+  osmextract::oe_get(
+    "Finland",
+    layer = "points",
+    query = "SELECT osm_id, highway, geometry FROM points WHERE highway = 'crossing'",
+    download_directory = osm_dir,
+    quiet = FALSE
+  ) |>
+    st_transform(3067)
 })
+
+message("Network: ", nrow(paths), " path segments, ",
+        nrow(crossings), " crossings")
+
+# Kilometres of pedestrian path inside each service area
+path_lengths <- st_intersection(
+  candidates |> select(buffer_id),
+  paths |> select(osm_id)
+) |>
+  mutate(seg_m = as.numeric(st_length(geometry))) |>
+  st_drop_geometry() |>
+  group_by(buffer_id) |>
+  summarise(path_km = sum(seg_m, na.rm = TRUE) / 1000, .groups = "drop")
+
+# Crossings inside each service area
+crossing_counts <- st_join(
+  crossings |> select(osm_id),
+  candidates |> select(buffer_id),
+  join = st_within
+) |>
+  st_drop_geometry() |>
+  filter(!is.na(buffer_id)) |>
+  count(buffer_id, name = "n_crossings")
+
+network_metrics <- candidates |>
+  st_drop_geometry() |>
+  select(buffer_id) |>
+  left_join(path_lengths, by = "buffer_id") |>
+  left_join(crossing_counts, by = "buffer_id") |>
+  mutate(
+    path_km = coalesce(path_km, 0),
+    n_crossings = coalesce(n_crossings, 0L)
+  )
 ```
 
 ```{r scoring}
@@ -350,12 +574,6 @@ scored <- candidates |>
     pop_density   = population / area_km2,
     path_density  = path_km / area_km2,
     crossing_rate = n_crossings / pmax(path_km, 1),
-
-    # Share of residents in the household types that dominate quick
-    # commerce elsewhere: young people living alone, households with small
-    # children, and students.
-    orderer_share = (hh_young_single + hh_small_child + students) /
-                     pmax(population, 1),
 
     c_demand       = norm01(working_age),
     c_customer_mix = norm01(orderer_share),
@@ -381,10 +599,22 @@ locations already in operation. The model was not built to identify them.
 validation <- scored |>
   mutate(rank_pos = rank(-score))
 
-auc <- with(validation, {
-  p <- score[served]; n <- score[!served]
+auc_for <- function(towns) {
+  flag <- validation$city %in% towns
+  p <- validation$score[flag]; n <- validation$score[!flag]
+  if (length(p) == 0 || length(n) == 0) return(NA_real_)
   mean(outer(p, n, ">")) + 0.5 * mean(outer(p, n, "=="))
-})
+}
+
+auc <- auc_for(served_towns$city)
+auc_confirmed <- auc_for(served_towns$city[served_towns$confirmed])
+
+tibble(
+  Anchor = c("All towns on file", "Confirmed sources only"),
+  Towns = c(nrow(served_towns), sum(served_towns$confirmed)),
+  AUC = round(c(auc, auc_confirmed), 3)
+) |>
+  kable(caption = "Sensitivity of the validation to unconfirmed rows")
 
 validation |>
   group_by(served) |>
@@ -396,10 +626,44 @@ validation |>
   ) |>
   kable(caption = sprintf("Separation, AUC = %.2f", auc))
 
+# served_towns uses "kunta"; validation uses "city". They are joined by name
+# throughout, so a municipality renamed or misspelled in either source drops
+# out silently rather than raising an error.
+# Served towns with no store in the model drop out of the validation
+# entirely. They are listed rather than imputed: placing a notional store at
+# a town centre would produce service-area populations and path lengths that
+# look measured but are invented, which is a worse failure than a smaller
+# validation set.
+unmatched <- setdiff(served_towns$city, unique(validation$city))
+if (length(unmatched) > 0) {
+  message(length(unmatched), " served towns have no S Group store in OSM ",
+          "and are excluded from the validation: ",
+          paste(unmatched, collapse = ", "))
+}
+
+# A stronger test than separation: if the score captures what actually
+# drives siting decisions, towns that adopted earlier should score higher.
+# This is a rank correlation over the 47 served municipalities, and unlike
+# the AUC it cannot be satisfied by simply ranking big cities first.
+adoption <- validation |>
+  filter(served) |>
+  group_by(city) |>
+  summarise(town_score = median(score), .groups = "drop") |>
+  inner_join(served_towns |> select(city, start), by = "city")
+
+rho <- cor(adoption$town_score, as.numeric(adoption$start),
+           method = "spearman", use = "complete.obs")
+
+tibble(
+  `Served towns matched` = nrow(adoption),
+  `Spearman rho (score vs adoption date)` = round(rho, 3)
+) |>
+  kable(caption = "Do earlier adopters score higher?")
+
 # A single anchor: according to public reporting, the S-market in central
 # Siilinjärvi has been the most active robot origin point in Finland.
 validation |>
-  filter(str_detect(name, "Siilinjärv")) |>
+  filter(city == "Siilinjärvi") |>
   select(name, city, population, path_km, score, rank_pos) |>
   kable(caption = "Where Siilinjärvi lands in the model")
 ```
@@ -408,6 +672,18 @@ If the AUC sits near 0.5, the model does not separate and its components
 are the wrong ones. If it is clearly above 0.7, features computed from
 open data explain existing siting decisions well enough that the same
 features can be used to propose the next ones.
+
+The rank correlation is the harder of the two tests. A negative rho means
+higher-scoring towns were served earlier, which is the direction expected
+if the score reflects the same considerations the rollout followed. A rho
+near zero means the score separates served from unserved but says nothing
+about the order in which sites were chosen, which would be worth reporting
+as it stands rather than tuning away.
+
+One caveat applies to both tests: the list records each municipality's
+first robot delivery, not every store subsequently activated. A store in a
+served municipality is therefore treated as served even if robots do not
+run from it, which makes both tests conservative.
 
 ## Leading candidates
 
@@ -445,8 +721,6 @@ scored |>
 
 ```{r map}
 #| fig-height: 7
-municipalities <- cached("municipalities", geofi::get_municipalities(year = 2023))
-
 ggplot() +
   geom_sf(data = municipalities, fill = "grey96", colour = "white",
           linewidth = 0.1) +
@@ -490,8 +764,9 @@ international benchmark accounts for.
 
 ## Limitations
 
-- Population is allocated from postal areas by area weighting, which
-  overstates edge stores in large, sparsely settled areas.
+- Population comes from the 1 km grid, whose cells are suppressed where
+  very few people live; those cells are counted as zero, which understates
+  the most sparsely settled service areas slightly.
 - OSM coverage varies regionally; pedestrian network digitisation is
   better in cities than in smaller towns, which biases the score toward
   cities systematically.
@@ -499,5 +774,9 @@ international benchmark accounts for.
   robot can physically get there and would require an elevation model.
 - The list of current locations is compiled from press releases and may
   be incomplete, which weakens the validation in both directions.
+- Stores are found by chain name in OpenStreetMap. Where a store is absent
+  or unnamed in OSM, its town cannot enter the validation at all; those
+  towns are listed in the output rather than filled in with a notional
+  location.
 - Store picking capacity is a binding constraint that open data cannot
   see at all.

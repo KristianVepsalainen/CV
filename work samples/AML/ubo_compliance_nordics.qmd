@@ -1,0 +1,342 @@
+---
+title: "Who can measure whether beneficial ownership rules are followed?"
+subtitle: "Four Nordic countries, one directive, and the only register an outsider can count"
+author: "Kristian Vepsäläinen"
+date: today
+lang: en
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+  pdf:
+    toc: false
+execute:
+  warning: false
+  message: false
+  cache: false
+params:
+  prh_base: "https://avoindata.prh.fi"
+  notice_code: "ESR"
+  start_year: 2015
+---
+
+```{r setup}
+#| include: false
+library(here)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(purrr)
+library(lubridate)
+library(httr2)
+library(jsonlite)
+library(ggplot2)
+library(knitr)
+
+options(cli.dynamic = FALSE, cli.ansi = FALSE, cli.unicode = FALSE)
+
+cache_dir <- here("data", "cache")
+dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+
+cached <- function(name, expr) {
+  path <- file.path(cache_dir, paste0(name, ".rds"))
+  if (file.exists(path)) return(readRDS(path))
+  val <- force(expr)
+  n <- if (is.null(val)) 0 else NROW(val)
+  if (n == 0) {
+    warning("Empty result for '", name, "' — not cached.")
+    return(val)
+  }
+  saveRDS(val, path)
+  val
+}
+```
+
+## The question
+
+Every EU and EEA state requires companies to register who ultimately owns
+or controls them. The obligation is near-identical across the Nordics
+because it comes from the same directives. What differs is the penalty
+ladder each country attached to it, and how quickly that ladder tightens
+when companies do not comply.
+
+Part 1 establishes, from the legislation itself, what each country says
+should happen to a company that fails to file. Part 2 measures whether it
+happened — in the one country where an outsider still can.
+
+## What an outsider can actually see
+
+The 2022 CJEU judgment in WM and Sovim ended public access to beneficial
+ownership registers, and each country closed differently. The result is
+that the underlying ownership data is now out of reach almost everywhere.
+Finland is the exception in one narrow but decisive respect: the *fact and
+date of a filing* is register metadata rather than beneficial ownership
+data, and it remains open.
+
+| Country | Ownership data | Filing metadata | Usable here |
+|---|---|---|---|
+| Finland | Closed | Open API, notice code `ESR`, from Nov 2014 | Yes |
+| Sweden | Restricted to authorities and obliged entities; tightened July 2026 | No | No |
+| Denmark | Closed to the public since Sept 2025 | No | No |
+| Norway | Restricted to Norwegian users with legitimate interest | No | No |
+| Iceland | Public on the registry website, no API | — | Scraping only |
+
+This table is a finding, not a preamble. Four countries implement the same
+obligation, and in exactly one of them can a third party count how well it
+is being met. Everywhere else, the only way to assess a counterparty's
+compliance is to buy the answer from a commercial provider.
+
+## Part 1 — What the law says should happen
+
+*This section is produced with the lexverse packages (finlex, swelex,
+danlex, eurlex) and states, per country: who must file, by when, and the
+ordered sequence of consequences for not filing. Its output is the table
+below, which Part 2 then tests against the data.*
+
+```{r policy_dates}
+# The dates and sanction steps below are the output of Part 1 and the input
+# to Part 2. Every row must be traceable to a provision — this is the seam
+# where the legal reading becomes a testable prediction, so an unsourced
+# row here would quietly become an unsourced claim in the results.
+policy_events <- tribble(
+  ~date,         ~country,  ~event,                              ~source,
+  "2019-07-01",  "FI",      "Filing obligation enters into force", "TODO: provision",
+  "2020-07-01",  "FI",      "Deadline for existing companies",     "TODO: provision",
+  "2025-07-31",  "NO",      "Mandatory filing deadline, daily fines follow", "TODO",
+) |>
+  mutate(date = as.Date(date))
+
+policy_events |> kable(caption = "Regulatory timeline feeding the measurement")
+```
+
+If Part 1 is right that the sanction ladder escalates at specific dates,
+filing behaviour should respond at those dates and not at arbitrary ones.
+That is the prediction Part 2 tests.
+
+## Part 2 — What the data shows
+
+### Finding the endpoints
+
+```{r api_discovery}
+# The exact REST paths are read from the service's own OpenAPI description
+# rather than hard-coded, so that a change at PRH surfaces as a readable
+# list instead of a 404 deep in a loop.
+spec_candidates <- c(
+  paste0(params$prh_base, "/opendata-registerednotices-api/v3/api-docs"),
+  paste0(params$prh_base, "/fi/krek/v3/api-docs"),
+  paste0(params$prh_base, "/krek/v3/api-docs")
+)
+
+spec <- NULL
+for (u in spec_candidates) {
+  spec <- tryCatch(
+    request(u) |> req_perform() |> resp_body_json(),
+    error = function(e) NULL
+  )
+  if (!is.null(spec)) {
+    message("OpenAPI spec found at: ", u)
+    break
+  }
+}
+
+if (is.null(spec)) {
+  message("No spec reachable. Open ", params$prh_base,
+          "/fi/krek/swagger-ui in a browser and set notices_path below by hand.")
+} else {
+  message("Endpoints: ", paste(names(spec$paths), collapse = ", "))
+}
+```
+
+```{r api_layer}
+# Everything about the API lives here. If PRH changes a path or a parameter
+# name, this is the only block that needs editing.
+notices_path <- "/opendata-registerednotices-api/v3/notices"
+
+fetch_notices_page <- function(start_date, end_date, page = 1) {
+  request(paste0(params$prh_base, notices_path)) |>
+    req_url_query(
+      registrationDateStart = format(start_date, "%Y-%m-%d"),
+      registrationDateEnd   = format(end_date, "%Y-%m-%d"),
+      page                  = page
+    ) |>
+    req_retry(max_tries = 4, backoff = ~ 5 * .x) |>
+    req_perform() |>
+    resp_body_json(simplifyVector = TRUE)
+}
+
+# Notices are fetched a month at a time and cached per month. A decade of
+# daily register activity is too much for one request, and monthly chunks
+# make a partial failure cheap to resume.
+fetch_month <- function(month_start) {
+  key <- paste0("notices_", format(month_start, "%Y_%m"))
+  cached(key, {
+    month_end <- ceiling_date(month_start, "month") - days(1)
+    pages <- list()
+    page <- 1
+    repeat {
+      res <- tryCatch(fetch_notices_page(month_start, month_end, page),
+                      error = function(e) NULL)
+      if (is.null(res)) break
+      rows <- res$notices %||% res$results %||% res$content
+      if (is.null(rows) || NROW(rows) == 0) break
+      pages[[page]] <- rows
+      if (NROW(rows) < 100) break   # last page
+      page <- page + 1
+    }
+    bind_rows(pages)
+  })
+}
+
+`%||%` <- function(a, b) if (is.null(a)) b else a
+```
+
+### Filings over time
+
+```{r notices}
+months <- seq(as.Date(paste0(params$start_year, "-01-01")),
+              floor_date(Sys.Date(), "month") - months(1),
+              by = "month")
+
+notices_raw <- map(months, fetch_month) |> bind_rows()
+
+stopifnot(NROW(notices_raw) > 0)
+
+# One company can file more than once — an initial filing and later updates
+# are both ESR entries. They are counted separately, because the update rate
+# is itself informative: a register that is filled once and never revised is
+# not current, whatever its coverage looks like.
+ubo_notices <- notices_raw |>
+  filter(map_lgl(registrationNoticeTypes,
+                 ~ any(str_detect(as.character(.x), params$notice_code)))) |>
+  transmute(
+    business_id = businessId,
+    reg_date    = as.Date(registrationDate),
+    company_form = companyForm
+  ) |>
+  arrange(business_id, reg_date) |>
+  group_by(business_id) |>
+  mutate(filing_seq = row_number()) |>
+  ungroup()
+
+message("UBO filings: ", nrow(ubo_notices),
+        " across ", n_distinct(ubo_notices$business_id), " companies")
+```
+
+```{r timeline}
+#| fig-height: 4
+monthly <- ubo_notices |>
+  mutate(month = floor_date(reg_date, "month"),
+         kind = if_else(filing_seq == 1, "First filing", "Update")) |>
+  count(month, kind)
+
+ggplot(monthly, aes(month, n, fill = kind)) +
+  geom_col() +
+  geom_vline(data = filter(policy_events, country == "FI"),
+             aes(xintercept = date), linetype = "dashed") +
+  labs(x = NULL, y = "Filings per month", fill = NULL,
+       caption = "Dashed lines: statutory dates identified in Part 1") +
+  theme_minimal()
+```
+
+### Coverage: the denominator
+
+```{r denominator}
+# Counting filings alone says nothing. The question is what share of the
+# companies subject to the obligation have met it, which needs the full
+# register as a denominator. PRH publishes the entire set of active
+# companies as a single download.
+companies <- cached("companies", {
+  # TODO: confirm the bulk download URL from the YTJ API page. The bulk file
+  # is the intended route; paging the whole register through the API is both
+  # slower and ruder.
+  stop("Set the YTJ bulk download URL before running this chunk.")
+})
+
+obliged_forms <- c("OY", "OYJ", "OSK")  # limited companies and co-operatives
+
+obliged <- companies |>
+  filter(company_form %in% obliged_forms)
+
+coverage <- obliged |>
+  mutate(has_filed = business_id %in% ubo_notices$business_id) |>
+  summarise(
+    companies = n(),
+    filed     = sum(has_filed),
+    share     = filed / companies
+  )
+
+coverage |>
+  mutate(share = scales::percent(share, accuracy = 0.1)) |>
+  kable(caption = "Share of obliged companies with a registered UBO filing")
+```
+
+### Who has not filed
+
+```{r profile}
+# The profile of non-filing is the part a compliance team can act on. None
+# of these variables identifies a person; they are register attributes of
+# the legal entity.
+profile <- obliged |>
+  mutate(
+    has_filed = business_id %in% ubo_notices$business_id,
+    age_years = as.numeric(Sys.Date() - as.Date(registration_date)) / 365.25,
+    age_band  = cut(age_years, c(0, 2, 5, 10, 20, Inf),
+                    labels = c("<2", "2-5", "5-10", "10-20", "20+"))
+  )
+
+profile |>
+  group_by(company_form, age_band) |>
+  summarise(n = n(), not_filed = mean(!has_filed), .groups = "drop") |>
+  filter(n >= 50) |>
+  mutate(not_filed = scales::percent(not_filed, accuracy = 0.1)) |>
+  kable(caption = "Non-filing rate by company form and age")
+```
+
+### Did the sanctions work?
+
+```{r response}
+# The test: filing volume should jump at the dates Part 1 identified and
+# not at arbitrary ones. A simple before/after comparison around each event,
+# against the surrounding months as a baseline, is enough to see whether the
+# response is real. Anything more elaborate would be precision the data does
+# not support.
+window_effect <- function(event_date, window = 3) {
+  before <- ubo_notices |>
+    filter(reg_date >= event_date %m-% months(window), reg_date < event_date) |>
+    nrow()
+  after <- ubo_notices |>
+    filter(reg_date >= event_date, reg_date < event_date %m+% months(window)) |>
+    nrow()
+  tibble(event_date, before, after, ratio = after / pmax(before, 1))
+}
+
+filter(policy_events, country == "FI") |>
+  pull(date) |>
+  map_dfr(window_effect) |>
+  mutate(ratio = round(ratio, 2)) |>
+  kable(caption = "Filings in the three months before and after each statutory date")
+```
+
+## What this means for an obliged entity
+
+*To be written once the numbers exist. The argument to make: the share of
+the register that has never filed is a counterparty risk signal available
+to anyone in Finland and to nobody in Sweden, Denmark or Norway, and it is
+derived from metadata rather than from the protected data itself.*
+
+## Limitations
+
+- A registered filing is not a correct filing. This measures whether a
+  company met a formal obligation, not whether the information it supplied
+  is accurate, and the register's own supervisory markings for deficient
+  data are not public.
+- Companies struck off the register for failing to file leave the
+  denominator, which flatters the coverage figure over time. The direction
+  of that bias is known; its size is not.
+- The obligation does not apply uniformly to every company form, so the
+  denominator depends on a legal judgement made in Part 1 rather than on
+  the data.
+- Nothing here identifies a beneficial owner, and nothing here could. That
+  is the point: the measurement is built from the existence of filings, not
+  their content.

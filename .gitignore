@@ -42,6 +42,10 @@ vignettes/*.pdf
 # pkgdown site
 docs/
 
+#big dataset
+data/cache
+data/osm
+
 # translation temp files
 po/*~
 
