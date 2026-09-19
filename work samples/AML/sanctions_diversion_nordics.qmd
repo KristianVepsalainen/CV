@@ -18,6 +18,7 @@ execute:
 params:
   baseline_years: 3
   last_year: 2025
+  regime_start: "2022-01-01"
   reporters: ["FIN", "SWE", "DNK", "NOR", "ISL"]
 ---
 
@@ -29,6 +30,7 @@ library(tidyr)
 library(stringr)
 library(purrr)
 library(lubridate)
+library(readr)
 library(ggplot2)
 library(knitr)
 
@@ -107,30 +109,443 @@ change that is simply the world economy.
 # annex instead, at eight digits, and are truncated to HS6. That truncation
 # is confined to the validation and never touches the headline measurement.
 chp_codes <- tribble(
-  ~hs6,     ~description,                ~tier, ~regulation, ~annex, ~effective,
-  "TODO",   "TODO — from Annex XL",      1L,    "833/2014",  "XL",   "TODO",
+  ~tier,  ~hs6,     ~description,
+  # Tier 1 — integrated circuits (microelectronics)
+  "1",    "854231", "Processors, controllers, converters, logic circuits",
+  "1",    "854232", "Memory integrated circuits",
+  "1",    "854233", "Amplifier integrated circuits",
+  "1",    "854239", "Other integrated circuits",
+  # Tier 2 — wireless communications, satellite navigation, passive components
+  "2",    "851762", "Voice/data transmission and switching apparatus",
+  "2",    "852691", "Radio navigational aid apparatus",
+  "2",    "853221", "Tantalum capacitors",
+  "2",    "853224", "Ceramic dielectric multilayer capacitors",
+  "2",    "854800", "Electrical machinery parts not elsewhere specified",
+  # Tier 3.A — further electronic components
+  "3.A",  "847150", "Processing units for data systems",
+  "3.A",  "850440", "Static converters",
+  "3.A",  "851769", "Apparatus for wired/wireless voice and data transmission",
+  "3.A",  "852589", "Digital cameras and video recorders",
+  "3.A",  "852910", "Aerials and aerial reflectors",
+  "3.A",  "852990", "Parts for transmission/reception apparatus",
+  "3.A",  "853669", "Plugs and sockets (<=1000V)",
+  "3.A",  "853690", "Electrical switching apparatus (<=1000V)",
+  "3.A",  "854110", "Diodes (non-LED)",
+  "3.A",  "854121", "Transistors (<1W dissipation)",
+  "3.A",  "854129", "Other transistors",
+  "3.A",  "854130", "Thyristors, diacs, triacs",
+  "3.A",  "854149", "Photosensitive semiconductor devices",
+  "3.A",  "854151", "Semiconductor-based transducers",
+  "3.A",  "854159", "Other semiconductor devices",
+  "3.A",  "854160", "Mounted piezo-electric crystals",
+  # Tier 3.B — mechanical and optical components
+  "3.B",  "848210", "Ball bearings",
+  "3.B",  "848220", "Tapered roller bearings",
+  "3.B",  "848230", "Spherical roller bearings",
+  "3.B",  "848250", "Cylindrical roller bearings",
+  "3.B",  "880730", "Aircraft and helicopter parts",
+  "3.B",  "901310", "Telescopic sights and periscopes",
+  "3.B",  "901380", "Other optical devices",
+  "3.B",  "901420", "Aeronautical/space navigation instruments",
+  "3.B",  "901480", "Other navigational instruments",
+  # Tier 4.A — manufacturing and test equipment for electronics
+  "4.A",  "847180", "Data-processing machine units",
+  "4.A",  "848610", "Boule/wafer manufacturing machines",
+  "4.A",  "848620", "Semiconductor/integrated circuit manufacturing machines",
+  "4.A",  "848640", "Specified semiconductor manufacturing apparatus",
+  "4.A",  "853400", "Printed circuits",
+  "4.A",  "854320", "Signal generators",
+  "4.A",  "902750", "Optical radiation instruments (UV/visible/infrared)",
+  "4.A",  "903020", "Oscilloscopes",
+  "4.A",  "903032", "Multimeters with recording device",
+  "4.A",  "903039", "Voltage/current/resistance measuring instruments",
+  "4.A",  "903082", "Semiconductor wafer/device measurement instruments",
+  # Tier 4.B — CNC machine tools (added February 2024)
+  "4.B",  "845710", "Numerically controlled machining centres",
+  "4.B",  "845811", "Numerically controlled horizontal lathes",
+  "4.B",  "845891", "Numerically controlled lathes (non-horizontal)",
+  "4.B",  "845961", "Numerically controlled metal milling machines",
+  "4.B",  "846693", "Machine parts and accessories (headings 8456-8461)",
 ) |>
-  mutate(list = "CHP", cn8_truncated = FALSE)
+  mutate(regulation = "833/2014", annex = "XL",
+         list = "CHP", cn8_truncated = FALSE)
 
+stopifnot(nrow(chp_codes) == 50, !any(duplicated(chp_codes$hs6)))
+
+# The vehicle codes carry no annex number here on purpose. Which annex they
+# sit in has changed across packages, and nothing downstream depends on it —
+# the restriction date comes from the amending act, not from the annex
+# label. The CELEX of the act that imposed each one is recovered below and
+# is the citable reference.
 anchor_codes_tbl <- tribble(
-  ~hs6,     ~description,                              ~regulation, ~annex,  ~effective,
-  "870421", "Motor vehicles for goods, diesel, <=5t",  "833/2014",  "XXIII", "TODO",
-  "870422", "Motor vehicles for goods, diesel, 5-20t", "833/2014",  "XXIII", "TODO",
-  "871620", "Trailers and semi-trailers",              "833/2014",  "XXIII", "TODO",
+  ~hs6,     ~description,
+  "870421", "Motor vehicles for goods, diesel, <=5t",
+  "870422", "Motor vehicles for goods, diesel, 5-20t",
+  "871620", "Trailers and semi-trailers",
 ) |>
-  mutate(tier = NA_integer_, list = "Industrial", cn8_truncated = TRUE)
+  mutate(tier = NA_character_, regulation = "833/2014",
+         annex = NA_character_, list = "Industrial", cn8_truncated = TRUE)
 
+target_codes <- unique(c(chp_codes$hs6, anchor_codes_tbl$hs6))
+```
+
+### When each code actually became restricted
+
+The date a code became restricted is deliberately not taken from Annex XL.
+Annex XL is where the CHP list is *carried*, but the annex itself was only
+created by the 14th package in June 2024, to give Article 12gb something to
+point at. The export bans on these goods are older and arrived in different
+packages — most of the electronics under the advanced-technology annex
+during 2022, the CNC machine tools later. Using the date Annex XL appeared
+would push years of already-restricted trade into the "before" window and
+quietly destroy the comparison.
+
+So the dates are derived from the regulation itself: every act amending
+Regulation 833/2014, in order, and the first one in which each code appears.
+The acts are found two ways — through the `eurlex` package's query builder
+and through the amendment relation in the underlying ontology — and the two
+are reconciled before anything is built on them.
+
+```{r eurlex_helpers}
+library(eurlex)
+
+# eurlex returns different column names depending on which include_ options
+# were set and on the package version, so columns are looked up by a list of
+# plausible names rather than assumed.
+pick <- function(df, ..., default = NA_character_) {
+  nms <- intersect(c(...), names(df))
+  if (length(nms) == 0) return(rep(default, nrow(df)))
+  df[[nms[1]]]
+}
+
+# Entry into force is the operative date. Where Cellar has not recorded one,
+# the document date stands in and the substitution is flagged, because the
+# two can differ by days and that matters at a year boundary.
+normalise_acts <- function(df, route) {
+  tibble(
+    route      = route,
+    work       = pick(df, "work"),
+    celex      = pick(df, "celex"),
+    title      = pick(df, "title"),
+    date_force = suppressWarnings(as.Date(pick(df, "dateforce", "date_force"))),
+    date_doc   = suppressWarnings(as.Date(pick(df, "date", "date_doc")))
+  ) |>
+    mutate(
+      effective        = coalesce(date_force, date_doc),
+      date_is_fallback = is.na(date_force)
+    ) |>
+    filter(!is.na(celex), !is.na(effective)) |>
+    distinct(celex, .keep_all = TRUE)
+}
+
+# A route that yields nothing must still return the same shape, so that the
+# reconciliation below compares two tables rather than a table and a NULL.
+empty_acts <- function() {
+  tibble(route = character(), work = character(), celex = character(),
+         title = character(), date_force = as.Date(character()),
+         date_doc = as.Date(character()), effective = as.Date(character()),
+         date_is_fallback = logical())
+}
+```
+
+```{r eurlex_route_a}
+# Route A — the package's own query builder.
+#
+# Every act amending the regulation carries it in the title ("... amending
+# Regulation (EU) No 833/2014"), so the whole step fits inside the eurlex
+# API. The advantage over hand-written SPARQL is that the selection is
+# readable without knowing SPARQL, and it survives changes to the Cellar
+# ontology, which the raw route does not.
+# elx_make_query gained include_title and date_from after the version
+# currently on CRAN, so the arguments are passed only where the installed
+# version accepts them. Both are load-bearing here: without a title there is
+# nothing to match on, and without a date bound the query asks Cellar for
+# every regulation ever adopted. So where they are missing this route is
+# skipped outright rather than run in a degraded form that would look like
+# a result.
+elx_args <- names(formals(elx_make_query))
+route_a_args <- c("include_title", "date_from")
+route_a_ok <- all(route_a_args %in% elx_args)
+
+acts_a <- if (!route_a_ok) {
+  message("eurlex ", as.character(utils::packageVersion("eurlex")),
+          " lacks ", paste(setdiff(route_a_args, elx_args), collapse = ", "),
+          "; Route A skipped and the cross-check is unavailable. ",
+          "remotes::install_github('michalovadek/eurlex') restores it.")
+  empty_acts()
+} else {
+  amend_query_pkg <- elx_make_query(
+    resource_type      = "regulation",
+    include_celex      = TRUE,
+    include_date       = TRUE,
+    include_date_force = TRUE,
+    include_title      = TRUE,
+    date_from          = "2022-01-01",
+    order              = TRUE
+  )
+
+  cached("eurlex_acts_route_a", {
+    elx_run_query(amend_query_pkg) |>
+      as_tibble() |>
+      rename_with(tolower) |>
+      filter(str_detect(coalesce(title, ""), "833/2014")) |>
+      normalise_acts("package")
+  })
+}
+
+message("Route A (elx_make_query + title filter): ", nrow(acts_a), " acts")
+```
+
+```{r eurlex_route_b}
+# Route B — the amendment relation itself.
+#
+# elx_make_query has no argument for it: the include_ options cover dates,
+# legal bases, citations, EuroVoc and court metadata, but the only relation
+# between documents it exposes is cdm:work_cites_work. Amendment is a
+# different and stricter relation, so this one goes in as SPARQL and runs
+# through elx_run_query like any other query.
+#
+# It is kept as a check on Route A rather than as the primary source: a
+# title filter is a proxy for "amends", and two independent routes agreeing
+# is worth more than either one on its own. (If the relation helpers in the
+# development version on GitHub land on CRAN, this block becomes a one-line
+# call and the SPARQL can go.)
+amend_query_sparql <- '
+PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT DISTINCT ?work ?celex ?dateforce ?date
+WHERE {
+  ?work cdm:resource_legal_amends_resource_legal ?amended .
+  ?amended cdm:resource_legal_id_celex "32014R0833"^^xsd:string .
+  OPTIONAL { ?work cdm:resource_legal_id_celex ?celex . }
+  OPTIONAL { ?work cdm:resource_legal_date_entry-into-force ?dateforce . }
+  OPTIONAL { ?work cdm:work_date_document ?date . }
+}
+ORDER BY ?dateforce'
+
+acts_b <- cached("eurlex_acts_route_b", {
+  res <- tryCatch(elx_run_query(amend_query_sparql),
+                  error = function(e) {
+                    warning("Route B failed: ", conditionMessage(e))
+                    NULL
+                  })
+  if (is.null(res) || NROW(res) == 0) {
+    empty_acts()
+  } else {
+    res |> as_tibble() |> rename_with(tolower) |> normalise_acts("sparql")
+  }
+})
+
+message("Route B (amends relation): ", nrow(acts_b), " acts")
+```
+
+```{r eurlex_reconcile}
+# Where the two routes disagree is worth knowing before anything is built on
+# top of them. Only in Route A usually means a related act that mentions the
+# regulation without amending it; only in Route B means an amendment whose
+# title is phrased differently, or one dated before the 2022 cut-off.
+only_a <- setdiff(acts_a$celex, acts_b$celex)
+only_b <- setdiff(acts_b$celex, acts_a$celex)
+
+tibble(
+  `Route A (title)` = if (route_a_ok) as.character(nrow(acts_a)) else "not run",
+  `Route B (amends)` = as.character(nrow(acts_b)),
+  `In both` = length(intersect(acts_a$celex, acts_b$celex)),
+  `Only A` = length(only_a),
+  `Only B` = length(only_b)
+) |>
+  kable(caption = "Agreement between the two EUR-Lex routes")
+
+# The union is used, not the intersection. Missing an act that restricted a
+# code would silently date that code too late, which biases the measurement;
+# including an act that merely mentions the regulation costs one extra text
+# fetch and nothing else, because a code is only dated from an act whose
+# text actually contains it.
+amendments_all <- bind_rows(acts_a, acts_b) |>
+  arrange(effective) |>
+  distinct(celex, .keep_all = TRUE)
+
+# Regulation 833/2014 dates from the Crimea measures, and the amendment
+# relation reaches back to 2014. Those older acts have to go, and not for
+# tidiness: a code first restricted in 2014 would be dated to 2014, its
+# "post" window would run from 2015 to 2025, and the 2022 rupture this
+# report is about would be averaged into a decade of ordinary trade.
+#
+# So the measurement is scoped to the post-invasion regime. A code carried
+# over from the Crimea-era measures and never re-listed after 2022 appears
+# in no act in scope and drops out, which is correct: it is outside the
+# regime being measured, not a gap in the data.
+amendments <- filter(amendments_all,
+                     effective >= as.Date(params$regime_start))
+
+tibble(
+  `Acts found` = nrow(amendments_all),
+  `Before regime start` = nrow(amendments_all) - nrow(amendments),
+  `Carried forward` = nrow(amendments)
+) |>
+  kable(caption = paste("Scoping to the regime beginning",
+                        params$regime_start))
+
+if (nrow(amendments) == 0) {
+  stop("Neither EUR-Lex route returned any amending act. Route A needs a ",
+       "newer eurlex; Route B needs the ontology predicate ",
+       "cdm:resource_legal_amends_resource_legal to still be current.")
+}
+
+message("Acts carried forward: ", nrow(amendments),
+        " (", sum(amendments$date_is_fallback), " using document date)")
+```
+
+```{r eurlex_text}
+text_dir <- here("data", "eurlex")
+dir.create(text_dir, recursive = TRUE, showWarnings = FALSE)
+
+# elx_fetch_data needs a full resolvable URL. The ?work values coming back
+# from the endpoint arrive as bare Cellar UUIDs, which curl then tries to
+# resolve as a hostname — so the URL is built here rather than taken from
+# the query result. CELEX is used in preference to the Cellar UUID because
+# it is stable, it is the identifier a lawyer would cite, and it makes the
+# provenance column in the review file readable instead of a hex string.
+celex_url <- function(celex) {
+  paste0("http://publications.europa.eu/resource/celex/", celex)
+}
+
+# Full text is fetched once per act and kept on disk. Cellar is a shared
+# public service and there is no reason to ask it for the same document
+# twice.
+fetch_act_text <- function(celex) {
+  path <- file.path(text_dir, paste0(celex, ".txt"))
+  if (file.exists(path)) return(read_file(path))
+  Sys.sleep(1)
+  txt <- tryCatch(
+    elx_fetch_data(url = celex_url(celex), type = "text", language_1 = "en"),
+    error = function(e) {
+      warning(celex, ": ", conditionMessage(e))
+      NA_character_
+    }
+  )
+  txt <- paste(stats::na.omit(txt), collapse = "\n")
+  if (!nzchar(txt)) return(NA_character_)
+  write_file(txt, path)
+  txt
+}
+
+# CN codes in annex text appear as "8542 31 00", "8542 31" or "85423100",
+# often prefixed "ex". Parsing the annex tables themselves is not worth it:
+# they flatten unpredictably in the text rendering and the layout changes
+# between packages. Instead every digit group that could be a CN code is
+# extracted and then intersected with the codes actually being looked for.
+# The regex is noisy; the intersection is not, because a six-digit string
+# that happens to match one of 53 target codes by accident is rare and shows
+# up as an implausible date in the review file.
+extract_hs6 <- function(txt) {
+  if (is.na(txt) || !nzchar(txt)) return(character(0))
+  str_extract_all(txt, "\\b\\d{4}\\s?\\d{2}(\\s?\\d{2})?\\b")[[1]] |>
+    str_remove_all("\\s") |>
+    str_sub(1, 6) |>
+    unique()
+}
+
+code_appearances <- cached("eurlex_code_appearances", {
+  map_dfr(amendments$celex, function(celex) {
+    txt <- fetch_act_text(celex)
+    found <- intersect(extract_hs6(txt), target_codes)
+    if (length(found) == 0) return(NULL)
+    tibble(celex = celex, hs6 = found)
+  })
+})
+
+fetched <- length(list.files(text_dir, pattern = "\\.txt$"))
+message("Text retrieved for ", fetched, " of ", nrow(amendments), " acts | ",
+        "codes located: ", n_distinct(code_appearances$hs6),
+        " of ", length(target_codes))
+
+# A near-total fetch failure produces an empty appearance table, which would
+# otherwise surface much later as "no code has a date" and look like a
+# regulatory finding rather than a broken download.
+if (fetched < 0.5 * nrow(amendments)) {
+  stop("Text could only be retrieved for ", fetched, " of ", nrow(amendments),
+       " acts. Check that ", celex_url(amendments$celex[1]),
+       " resolves before reading anything below.")
+}
+```
+
+```{r eurlex_effective}
+code_effective_auto <- code_appearances |>
+  left_join(select(amendments, celex, effective), by = "celex") |>
+  group_by(hs6) |>
+  slice_min(effective, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  transmute(hs6, effective, imposed_by = celex, source = "eurlex")
+
+# First appearance is a good approximation, not a fact. A code can show up
+# in an amending act because an entry was reworded, moved between annexes,
+# or restricted for import rather than export. Rows verified against the
+# regulation text go here and override the extraction.
+code_effective_manual <- tribble(
+  ~hs6, ~effective, ~imposed_by,
+  # "854231", "2022-04-08", "32022R0576 (5th package), Annex VII",
+)
+
+code_effective_manual <- if (nrow(code_effective_manual) > 0) {
+  mutate(code_effective_manual,
+         effective = as.Date(effective), source = "manual")
+} else {
+  tibble(hs6 = character(), effective = as.Date(character()),
+         imposed_by = character(), source = character())
+}
+
+code_effective <- code_effective_auto |>
+  filter(!hs6 %in% code_effective_manual$hs6) |>
+  bind_rows(code_effective_manual)
+
+# Written out so the extraction can be checked against the regulation text
+# rather than trusted. This is the step that turns a scrape into evidence,
+# and it is the file to open first when a result looks surprising.
+review_dir <- here("data", "derived")
+dir.create(review_dir, recursive = TRUE, showWarnings = FALSE)
+code_effective |>
+  left_join(select(chp_codes, hs6, tier, description), by = "hs6") |>
+  arrange(effective, hs6) |>
+  readr::write_csv(file.path(review_dir, "code_effective_for_review.csv"))
+
+not_found <- setdiff(target_codes, code_effective$hs6)
+if (length(not_found) > 0) {
+  message(length(not_found), " code(s) appear in no amending act and will ",
+          "be excluded: ", paste(not_found, collapse = ", "))
+}
+
+code_effective |>
+  count(effective, imposed_by, source, name = "codes") |>
+  arrange(effective) |>
+  kable(caption = "Restriction dates derived from the amending regulations")
+```
+
+```{r assemble_codes}
 restricted_codes <- bind_rows(chp_codes, anchor_codes_tbl) |>
-  mutate(effective = as.Date(effective))
+  left_join(code_effective, by = "hs6")
 
-# A missing effective date is not a cosmetic gap: without it the code has no
-# baseline and would silently be dropped or, worse, compared against the
-# wrong years.
-stopifnot(!any(is.na(restricted_codes$effective)),
-          !any(restricted_codes$hs6 == "TODO"))
+# A code without an effective date has no baseline, so it is dropped rather
+# than compared against arbitrary years. A handful of misses is a gap in the
+# extraction; losing most of the list means the SPARQL or the regex is
+# broken, and the run stops rather than reporting a confident number built
+# on a tenth of the goods.
+coverage <- mean(!is.na(restricted_codes$effective))
+if (coverage < 0.7) {
+  stop(sprintf(
+    "Only %.0f%% of codes have a restriction date. Check the EUR-Lex query ",
+    100 * coverage),
+    "before reading anything below.")
+}
+if (coverage < 1) {
+  message(sprintf("%.0f%% of codes dated; %d dropped for lack of a date.",
+                  100 * coverage, sum(is.na(restricted_codes$effective))))
+}
+
+restricted_codes <- filter(restricted_codes, !is.na(effective))
 
 restricted_codes |>
-  count(list, annex, cn8_truncated, name = "codes") |>
+  count(list, cn8_truncated, name = "codes") |>
   kable(caption = "Restricted goods carried into the measurement")
 ```
 
@@ -165,7 +580,7 @@ if (dropped > 0) {
 }
 
 code_windows |>
-  count(eff_year, name = "codes") |>
+  count(eff_year, imposed_by, name = "codes") |>
   arrange(eff_year) |>
   kable(caption = "When each batch of codes became restricted")
 ```
@@ -435,6 +850,22 @@ map_dfr(c("none", transit_hubs), ratio_without) |>
 - Baselines differ in length across codes where a code was restricted too
   recently for a full window, and a code with no post period at all is
   excluded. Both are reported in the output rather than averaged away.
+- Restriction dates are derived by finding the first amending act whose
+  text contains each code. A code can appear in an act because an entry was
+  reworded or moved between annexes rather than newly restricted, so the
+  dates are an approximation until checked. The extraction is written to
+  `data/derived/code_effective_for_review.csv` for exactly that check, and
+  verified rows override it.
+- Entry-into-force dates come from Cellar. Where Cellar records none, the
+  document date is used instead and the substitution is counted in the
+  output, because the two can straddle a year boundary.
+- The set of amending acts is the union of a title match and the ontology's
+  amendment relation. Neither is authoritative on its own: the title filter
+  is a proxy, and the relation depends on a predicate name that the ontology
+  can revise. The reconciliation table reports how far apart they were.
+- Only acts from the start of the post-invasion regime are in scope. A good
+  restricted under the 2014 Crimea measures and not re-listed since is
+  therefore absent from the analysis, even though it remains restricted.
 - Mirror statistics disagree. What Finland records as an export to
   Kazakhstan and what Kazakhstan records as an import from Finland are
   frequently different numbers, and neither is authoritative.
