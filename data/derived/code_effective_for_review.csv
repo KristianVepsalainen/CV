@@ -1,54 +1,54 @@
-hs6,effective,imposed_by,source,tier,description
-851762,2022-03-16,32022R0428,eurlex,2,Voice/data transmission and switching apparatus
-851769,2022-03-16,32022R0428,eurlex,3.A,Apparatus for wired/wireless voice and data transmission
-852691,2022-03-16,32022R0428,eurlex,2,Radio navigational aid apparatus
-852910,2022-03-16,32022R0428,eurlex,3.A,Aerials and aerial reflectors
-870422,2022-04-09,32022R0576,eurlex,NA,NA
-871620,2022-04-09,32022R0576,eurlex,NA,NA
-901310,2022-04-09,32022R0576,eurlex,3.B,Telescopic sights and periscopes
-901380,2022-04-09,32022R0576,eurlex,3.B,Other optical devices
-848220,2022-07-22,32022R1269,eurlex,3.B,Tapered roller bearings
-854110,2022-10-07,32022R1904,eurlex,3.A,Diodes (non-LED)
-854121,2022-10-07,32022R1904,eurlex,3.A,Transistors (<1W dissipation)
-854129,2022-10-07,32022R1904,eurlex,3.A,Other transistors
-854149,2022-10-07,32022R1904,eurlex,3.A,Photosensitive semiconductor devices
-854151,2022-10-07,32022R1904,eurlex,3.A,Semiconductor-based transducers
-854159,2022-10-07,32022R1904,eurlex,3.A,Other semiconductor devices
-854231,2022-10-07,32022R1904,eurlex,1,"Processors, controllers, converters, logic circuits"
-854232,2022-10-07,32022R1904,eurlex,1,Memory integrated circuits
-854233,2022-10-07,32022R1904,eurlex,1,Amplifier integrated circuits
-854239,2022-10-07,32022R1904,eurlex,1,Other integrated circuits
-847150,2022-12-17,32022R2474,eurlex,3.A,Processing units for data systems
-847180,2022-12-17,32022R2474,eurlex,4.A,Data-processing machine units
-853224,2022-12-17,32022R2474,eurlex,2,Ceramic dielectric multilayer capacitors
-853400,2022-12-17,32022R2474,eurlex,4.A,Printed circuits
-853669,2022-12-17,32022R2474,eurlex,3.A,Plugs and sockets (<=1000V)
-853690,2022-12-17,32022R2474,eurlex,3.A,Electrical switching apparatus (<=1000V)
-854160,2022-12-17,32022R2474,eurlex,3.A,Mounted piezo-electric crystals
-854800,2022-12-17,32022R2474,eurlex,2,Electrical machinery parts not elsewhere specified
-845710,2023-02-26,32023R0427,eurlex,4.B,Numerically controlled machining centres
-845961,2023-02-26,32023R0427,eurlex,4.B,Numerically controlled metal milling machines
-846693,2023-02-26,32023R0427,eurlex,4.B,Machine parts and accessories (headings 8456-8461)
-848210,2023-02-26,32023R0427,eurlex,3.B,Ball bearings
-848230,2023-02-26,32023R0427,eurlex,3.B,Spherical roller bearings
-848250,2023-02-26,32023R0427,eurlex,3.B,Cylindrical roller bearings
-852589,2023-02-26,32023R0427,eurlex,3.A,Digital cameras and video recorders
-853221,2023-02-26,32023R0427,eurlex,2,Tantalum capacitors
-854130,2023-02-26,32023R0427,eurlex,3.A,"Thyristors, diacs, triacs"
-854320,2023-02-26,32023R0427,eurlex,4.A,Signal generators
-903032,2023-02-26,32023R0427,eurlex,4.A,Multimeters with recording device
-903039,2023-02-26,32023R0427,eurlex,4.A,Voltage/current/resistance measuring instruments
-903082,2023-02-26,32023R0427,eurlex,4.A,Semiconductor wafer/device measurement instruments
-848610,2023-06-24,32023R1214,eurlex,4.A,Boule/wafer manufacturing machines
-848620,2023-06-24,32023R1214,eurlex,4.A,Semiconductor/integrated circuit manufacturing machines
-848640,2023-06-24,32023R1214,eurlex,4.A,Specified semiconductor manufacturing apparatus
-852990,2023-06-24,32023R1214,eurlex,3.A,Parts for transmission/reception apparatus
-870421,2023-06-24,32023R1214,eurlex,NA,NA
-901420,2023-06-24,32023R1214,eurlex,3.B,Aeronautical/space navigation instruments
-901480,2023-06-24,32023R1214,eurlex,3.B,Other navigational instruments
-902750,2023-06-24,32023R1214,eurlex,4.A,Optical radiation instruments (UV/visible/infrared)
-903020,2023-06-24,32023R1214,eurlex,4.A,Oscilloscopes
-845811,2023-12-19,32023R2878,eurlex,4.B,Numerically controlled horizontal lathes
-850440,2023-12-19,32023R2878,eurlex,3.A,Static converters
-845891,2024-06-25,32024R1745,eurlex,4.B,Numerically controlled lathes (non-horizontal)
-880730,2024-06-25,32024R1745,eurlex,3.B,Aircraft and helicopter parts
+hs6,category,description,tier,list,effective,act,imposed_by,act_url,source
+851762,"Comms, navigation, passive components",Voice/data transmission and switching apparatus,2,CHP,2022-03-16,Reg (EU) 2022/0428,32022R0428,http://publications.europa.eu/resource/celex/32022R0428,eurlex
+851769,Electronic components,Apparatus for wired/wireless voice and data transmission,3.A,CHP,2022-03-16,Reg (EU) 2022/0428,32022R0428,http://publications.europa.eu/resource/celex/32022R0428,eurlex
+852691,"Comms, navigation, passive components",Radio navigational aid apparatus,2,CHP,2022-03-16,Reg (EU) 2022/0428,32022R0428,http://publications.europa.eu/resource/celex/32022R0428,eurlex
+852910,Electronic components,Aerials and aerial reflectors,3.A,CHP,2022-03-16,Reg (EU) 2022/0428,32022R0428,http://publications.europa.eu/resource/celex/32022R0428,eurlex
+870422,Vehicles and trailers,"Motor vehicles for goods, diesel, 5-20t",NA,Industrial,2022-04-09,Reg (EU) 2022/0576,32022R0576,http://publications.europa.eu/resource/celex/32022R0576,eurlex
+871620,Vehicles and trailers,Trailers and semi-trailers,NA,Industrial,2022-04-09,Reg (EU) 2022/0576,32022R0576,http://publications.europa.eu/resource/celex/32022R0576,eurlex
+901310,"Bearings, optics, navigation instruments",Telescopic sights and periscopes,3.B,CHP,2022-04-09,Reg (EU) 2022/0576,32022R0576,http://publications.europa.eu/resource/celex/32022R0576,eurlex
+901380,"Bearings, optics, navigation instruments",Other optical devices,3.B,CHP,2022-04-09,Reg (EU) 2022/0576,32022R0576,http://publications.europa.eu/resource/celex/32022R0576,eurlex
+848220,"Bearings, optics, navigation instruments",Tapered roller bearings,3.B,CHP,2022-07-22,Reg (EU) 2022/1269,32022R1269,http://publications.europa.eu/resource/celex/32022R1269,eurlex
+854110,Electronic components,Diodes (non-LED),3.A,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854121,Electronic components,Transistors (<1W dissipation),3.A,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854129,Electronic components,Other transistors,3.A,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854149,Electronic components,Photosensitive semiconductor devices,3.A,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854151,Electronic components,Semiconductor-based transducers,3.A,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854159,Electronic components,Other semiconductor devices,3.A,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854231,Integrated circuits,"Processors, controllers, converters, logic circuits",1,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854232,Integrated circuits,Memory integrated circuits,1,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854233,Integrated circuits,Amplifier integrated circuits,1,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+854239,Integrated circuits,Other integrated circuits,1,CHP,2022-10-07,Reg (EU) 2022/1904,32022R1904,http://publications.europa.eu/resource/celex/32022R1904,eurlex
+847150,Electronic components,Processing units for data systems,3.A,CHP,2022-12-17,Reg (EU) 2022/2474,32022R2474,http://publications.europa.eu/resource/celex/32022R2474,eurlex
+847180,Electronics manufacturing and test equipment,Data-processing machine units,4.A,CHP,2022-12-17,Reg (EU) 2022/2474,32022R2474,http://publications.europa.eu/resource/celex/32022R2474,eurlex
+853224,"Comms, navigation, passive components",Ceramic dielectric multilayer capacitors,2,CHP,2022-12-17,Reg (EU) 2022/2474,32022R2474,http://publications.europa.eu/resource/celex/32022R2474,eurlex
+853400,Electronics manufacturing and test equipment,Printed circuits,4.A,CHP,2022-12-17,Reg (EU) 2022/2474,32022R2474,http://publications.europa.eu/resource/celex/32022R2474,eurlex
+853669,Electronic components,Plugs and sockets (<=1000V),3.A,CHP,2022-12-17,Reg (EU) 2022/2474,32022R2474,http://publications.europa.eu/resource/celex/32022R2474,eurlex
+853690,Electronic components,Electrical switching apparatus (<=1000V),3.A,CHP,2022-12-17,Reg (EU) 2022/2474,32022R2474,http://publications.europa.eu/resource/celex/32022R2474,eurlex
+854160,Electronic components,Mounted piezo-electric crystals,3.A,CHP,2022-12-17,Reg (EU) 2022/2474,32022R2474,http://publications.europa.eu/resource/celex/32022R2474,eurlex
+854800,"Comms, navigation, passive components",Electrical machinery parts not elsewhere specified,2,CHP,2022-12-17,Reg (EU) 2022/2474,32022R2474,http://publications.europa.eu/resource/celex/32022R2474,eurlex
+845710,CNC machine tools,Numerically controlled machining centres,4.B,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+845961,CNC machine tools,Numerically controlled metal milling machines,4.B,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+846693,CNC machine tools,Machine parts and accessories (headings 8456-8461),4.B,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+848210,"Bearings, optics, navigation instruments",Ball bearings,3.B,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+848230,"Bearings, optics, navigation instruments",Spherical roller bearings,3.B,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+848250,"Bearings, optics, navigation instruments",Cylindrical roller bearings,3.B,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+852589,Electronic components,Digital cameras and video recorders,3.A,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+853221,"Comms, navigation, passive components",Tantalum capacitors,2,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+854130,Electronic components,"Thyristors, diacs, triacs",3.A,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+854320,Electronics manufacturing and test equipment,Signal generators,4.A,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+903032,Electronics manufacturing and test equipment,Multimeters with recording device,4.A,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+903039,Electronics manufacturing and test equipment,Voltage/current/resistance measuring instruments,4.A,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+903082,Electronics manufacturing and test equipment,Semiconductor wafer/device measurement instruments,4.A,CHP,2023-02-26,Reg (EU) 2023/0427,32023R0427,http://publications.europa.eu/resource/celex/32023R0427,eurlex
+848610,Electronics manufacturing and test equipment,Boule/wafer manufacturing machines,4.A,CHP,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+848620,Electronics manufacturing and test equipment,Semiconductor/integrated circuit manufacturing machines,4.A,CHP,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+848640,Electronics manufacturing and test equipment,Specified semiconductor manufacturing apparatus,4.A,CHP,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+852990,Electronic components,Parts for transmission/reception apparatus,3.A,CHP,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+870421,Vehicles and trailers,"Motor vehicles for goods, diesel, <=5t",NA,Industrial,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+901420,"Bearings, optics, navigation instruments",Aeronautical/space navigation instruments,3.B,CHP,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+901480,"Bearings, optics, navigation instruments",Other navigational instruments,3.B,CHP,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+902750,Electronics manufacturing and test equipment,Optical radiation instruments (UV/visible/infrared),4.A,CHP,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+903020,Electronics manufacturing and test equipment,Oscilloscopes,4.A,CHP,2023-06-24,Reg (EU) 2023/1214,32023R1214,http://publications.europa.eu/resource/celex/32023R1214,eurlex
+845811,CNC machine tools,Numerically controlled horizontal lathes,4.B,CHP,2023-12-19,Reg (EU) 2023/2878,32023R2878,http://publications.europa.eu/resource/celex/32023R2878,eurlex
+850440,Electronic components,Static converters,3.A,CHP,2023-12-19,Reg (EU) 2023/2878,32023R2878,http://publications.europa.eu/resource/celex/32023R2878,eurlex
+845891,CNC machine tools,Numerically controlled lathes (non-horizontal),4.B,CHP,2024-06-25,Reg (EU) 2024/1745,32024R1745,http://publications.europa.eu/resource/celex/32024R1745,eurlex
+880730,"Bearings, optics, navigation instruments",Aircraft and helicopter parts,3.B,CHP,2024-06-25,Reg (EU) 2024/1745,32024R1745,http://publications.europa.eu/resource/celex/32024R1745,eurlex

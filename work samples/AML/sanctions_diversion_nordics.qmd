@@ -172,6 +172,21 @@ chp_codes <- tribble(
 
 stopifnot(nrow(chp_codes) == 50, !any(duplicated(chp_codes$hs6)))
 
+# Plain-language names for the tiers. Six-digit codes carry no meaning to
+# anyone who does not work with the nomenclature daily, and every table
+# below is read by people who do not.
+tier_labels <- c(
+  "1"   = "Integrated circuits",
+  "2"   = "Comms, navigation, passive components",
+  "3.A" = "Electronic components",
+  "3.B" = "Bearings, optics, navigation instruments",
+  "4.A" = "Electronics manufacturing and test equipment",
+  "4.B" = "CNC machine tools"
+)
+
+chp_codes <- mutate(chp_codes, category = unname(tier_labels[tier]))
+stopifnot(!any(is.na(chp_codes$category)))
+
 # The vehicle codes carry no annex number here on purpose. Which annex they
 # sit in has changed across packages, and nothing downstream depends on it —
 # the restriction date comes from the amending act, not from the annex
@@ -184,9 +199,15 @@ anchor_codes_tbl <- tribble(
   "871620", "Trailers and semi-trailers",
 ) |>
   mutate(tier = NA_character_, regulation = "833/2014",
-         annex = NA_character_, list = "Industrial", cn8_truncated = TRUE)
+         annex = NA_character_, list = "Industrial", cn8_truncated = TRUE,
+         category = "Vehicles and trailers")
 
 target_codes <- unique(c(chp_codes$hs6, anchor_codes_tbl$hs6))
+
+# One lookup for anything that needs to put a human-readable name next to a
+# code, so that the review file and every table describe a good the same way.
+code_meta <- bind_rows(chp_codes, anchor_codes_tbl) |>
+  select(hs6, tier, category, description, list)
 ```
 
 ### When each code actually became restricted
@@ -410,6 +431,13 @@ celex_url <- function(celex) {
   paste0("http://publications.europa.eu/resource/celex/", celex)
 }
 
+# 32024R1745 -> "Reg (EU) 2024/1745". A CELEX number is precise and
+# unreadable; the short form is how the act is referred to in practice, and
+# both appear in the review file so nothing is lost.
+celex_short <- function(celex) {
+  sub("^3(\\d{4})R(\\d{4})$", "Reg (EU) \\1/\\2", celex)
+}
+
 # Full text is fetched once per act and kept on disk. Cellar is a shared
 # public service and there is no reason to ask it for the same document
 # twice.
@@ -505,20 +533,41 @@ code_effective <- code_effective_auto |>
 review_dir <- here("data", "derived")
 dir.create(review_dir, recursive = TRUE, showWarnings = FALSE)
 code_effective |>
-  left_join(select(chp_codes, hs6, tier, description), by = "hs6") |>
+  left_join(code_meta, by = "hs6") |>
+  mutate(act = celex_short(imposed_by), act_url = celex_url(imposed_by)) |>
+  select(hs6, category, description, tier, list, effective, act, imposed_by,
+         act_url, source) |>
   arrange(effective, hs6) |>
-  readr::write_csv(file.path(review_dir, "code_effective_for_review.csv"))
+  write_csv(file.path(review_dir, "code_effective_for_review.csv"))
 
 not_found <- setdiff(target_codes, code_effective$hs6)
 if (length(not_found) > 0) {
-  message(length(not_found), " code(s) appear in no amending act and will ",
-          "be excluded: ", paste(not_found, collapse = ", "))
+  message(length(not_found), " code(s) appear in no act in scope and will ",
+          "be excluded: ",
+          code_meta |>
+            filter(hs6 %in% not_found) |>
+            mutate(lab = paste0(hs6, " (", description, ")")) |>
+            pull(lab) |>
+            paste(collapse = "; "))
 }
 
-code_effective |>
-  count(effective, imposed_by, source, name = "codes") |>
-  arrange(effective) |>
-  kable(caption = "Restriction dates derived from the amending regulations")
+# Coverage by category rather than a second list of dates. What matters
+# before reading any result is whether a whole category failed to date,
+# because that would remove a kind of good from the comparison entirely
+# rather than thinning it evenly.
+code_meta |>
+  left_join(select(code_effective, hs6, effective), by = "hs6") |>
+  group_by(Category = category) |>
+  summarise(
+    Codes = n(),
+    Dated = sum(!is.na(effective)),
+    `First restricted` = suppressWarnings(min(effective, na.rm = TRUE)),
+    .groups = "drop"
+  ) |>
+  mutate(`First restricted` = if_else(is.finite(`First restricted`),
+                                      `First restricted`, as.Date(NA))) |>
+  arrange(Category) |>
+  kable(caption = "Date coverage by product category")
 ```
 
 ```{r assemble_codes}
@@ -532,10 +581,12 @@ restricted_codes <- bind_rows(chp_codes, anchor_codes_tbl) |>
 # on a tenth of the goods.
 coverage <- mean(!is.na(restricted_codes$effective))
 if (coverage < 0.7) {
-  stop(sprintf(
-    "Only %.0f%% of codes have a restriction date. Check the EUR-Lex query ",
-    100 * coverage),
-    "before reading anything below.")
+  stop(sprintf(paste(
+    "Only %.0f%% of codes (%d of %d) have a restriction date.",
+    "Check code_appearances and the EUR-Lex query before going further;",
+    "nothing below this point will run."),
+    100 * coverage, sum(!is.na(restricted_codes$effective)),
+    nrow(restricted_codes)))
 }
 if (coverage < 1) {
   message(sprintf("%.0f%% of codes dated; %d dropped for lack of a date.",
@@ -580,9 +631,19 @@ if (dropped > 0) {
 }
 
 code_windows |>
-  count(eff_year, imposed_by, name = "codes") |>
-  arrange(eff_year) |>
-  kable(caption = "When each batch of codes became restricted")
+  count(effective, imposed_by, category, name = "codes") |>
+  arrange(effective, desc(codes)) |>
+  transmute(
+    Date     = effective,
+    Act      = celex_short(imposed_by),
+    Category = category,
+    Codes    = codes,
+    Baseline = paste0(year(effective) - params$baseline_years, "–",
+                      year(effective) - 1)
+  ) |>
+  kable(caption = paste(
+    "What each act restricted, and the baseline years each code is",
+    "measured against"))
 ```
 
 ```{r policy_events}
@@ -592,14 +653,39 @@ code_windows |>
 # against circumvention of the CHP items specifically. If that obligation
 # bites, its effect should appear in CHP flows and not in the others, which
 # is a sharper prediction than "sanctions reduce trade".
+# Each row is either a legal act, identified by CELEX and therefore
+# checkable against the text, or a dated context marker with no instrument
+# behind it. The two are kept apart so that nothing downstream cites an
+# event as though it were a provision.
+#
+# The date an obligation starts to apply is not the date its act entered
+# into force. Article 12gb was enacted by the June 2024 package and applies
+# from 26 December 2024, so the date and the CELEX below deliberately
+# disagree.
 policy_events <- tribble(
-  ~date,        ~event,                                              ~source,
-  "2022-02-24", "Full-scale invasion; sectoral packages begin",       "TODO",
-  "2024-12-26", "Art. 12gb anti-circumvention duty applies (Russia)", "TODO",
+  ~date,        ~event,                                              ~celex,
+  "2022-02-24", "Full-scale invasion; sectoral packages begin",       NA_character_,
+  "2024-12-26", "Art. 12gb anti-circumvention duty applies (Russia)", "32024R1745",
 ) |>
-  mutate(date = as.Date(date))
+  mutate(
+    date   = as.Date(date),
+    kind   = if_else(is.na(celex), "context", "legal act"),
+    source = if_else(is.na(celex), NA_character_, celex_url(celex))
+  )
 
-policy_events |> kable(caption = "Obligations tested in Part 2")
+# An act cited here that the EUR-Lex query never returned means either the
+# attribution is wrong or the scoping dropped something it should not have.
+# Either way it is worth knowing before the date is used as a boundary.
+unverified <- setdiff(stats::na.omit(policy_events$celex), amendments$celex)
+if (length(unverified) > 0) {
+  warning("policy_events cites acts not among those retrieved: ",
+          paste(unverified, collapse = ", "))
+}
+
+policy_events |>
+  transmute(Date = date, Event = event, Kind = kind,
+            Act = coalesce(celex_short(celex), "—")) |>
+  kable(caption = "Obligations tested in Part 2")
 ```
 
 ## Part 2 — What the trade data shows
@@ -623,6 +709,15 @@ target <- "RUS"
 ### Data
 
 ```{r trade_data}
+# Running chunks by hand makes it easy to arrive here after an earlier chunk
+# stopped, and "object not found" points at the wrong place. This names the
+# chunk that is actually missing.
+if (!exists("code_windows")) {
+  stop("code_windows does not exist — the 'windows' chunk has not run. ",
+       "Something before it stopped; check the assemble_codes coverage ",
+       "check and the EUR-Lex chunks above.")
+}
+
 # UN Comtrade is used for all five reporters rather than Eurostat, because
 # Norway and Iceland are outside Comext and a cross-country comparison built
 # from two different collection systems would confound the measurement with
